@@ -1,0 +1,30 @@
+{
+    "type": "script",
+    "description": "writeText_names_jhenyfer",
+    "store": {},
+    "modes": [
+        1
+    ],
+    "usageCount": 0,
+    "prompt": false,
+    "omitTrigger": false,
+    "showInTrayMenu": false,
+    "abbreviation": {
+        "abbreviations": [
+            "@jh"
+        ],
+        "backspace": true,
+        "ignoreCase": true,
+        "immediate": true,
+        "triggerInside": false,
+        "wordChars": "[\\w]"
+    },
+    "hotkey": {
+        "modifiers": [],
+        "hotKey": null
+    },
+    "filter": {
+        "regex": null,
+        "isRecursive": false
+    }
+}
