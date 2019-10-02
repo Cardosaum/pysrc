@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import pyperclip
 import pyautogui
-from os import popen, system, chdir
+from os import popen, system, chdir, getcwd
 from os.path import expanduser, abspath
 from time import sleep
 import re
@@ -25,7 +25,7 @@ home = expanduser('~')
 clipboard = pyperclip.paste()
 
 mcs.normalizePath()
-chdir(abspath('./././'))
+chdir(abspath(f'{getcwd()}/src/autokey/'))
 
 # function to get active window
 def activeWindow():
