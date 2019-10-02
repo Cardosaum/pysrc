@@ -1,11 +1,12 @@
 #!/usr/bin/env python3
 import pyperclip
 import pyautogui
-from os import popen, system
-from os.path import expanduser
+from os import popen, system, chdir
+from os.path import expanduser, abspath
 from time import sleep
 import re
 from sys import exit
+import mcs
 ### CONFIGURATION ###
 
 anki_profile_name = 'study'
@@ -22,6 +23,9 @@ gthumb_width = ''
 gthumb_height = ''
 home = expanduser('~')
 clipboard = pyperclip.paste()
+
+mcs.normalizePath()
+chdir(abspath('./././'))
 
 # function to get active window
 def activeWindow():

@@ -461,7 +461,10 @@ def ppress(key):
     press(key)
 
 def runScript(scriptName):
-    from os import system
+    from os import chdir, system, getcwd
+    from os.path import abspath
+    normalizePath()
+    chdir(abspath(f'{getcwd()}/src/autokey/'))
     system(f'python {scriptName}')
 
 def runCommand(command):
