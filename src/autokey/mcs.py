@@ -37,7 +37,7 @@ def getPrintPath():
     return printPath
 
 def getData(key, returnString=True):
-    from os.path import abspath, expanduser
+    from os.path import abspath, expanduser, join
     from shelve import open as op
     data = op(abspath(join('..', 'data', 'config')))
     dataNeeded = data[key]
@@ -76,7 +76,7 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
             return list(f.items())
 
 def saveData(key, value):
-    from os.path import abspath, expanduser
+    from os.path import abspath, expanduser, join
     normalizePath()
     from shelve import open as op
     data = op(abspath(join('..', 'data', 'config')))
@@ -86,14 +86,14 @@ def saveData(key, value):
     return dataSaved
 
 def removeData(key):
-    from os.path import abspath, expanduser
+    from os.path import abspath, expanduser, join
     from os import chdir, getcwd
     pwd = getcwd()
     home = expanduser('~')
     rootFolderForScripts = data_get('rootFolderForScripts', isFileOrFolder=True, needTostartWithHome=True)
     chdir(rootFolderForScripts)
     from shelve import open as op
-    data = op(abspath('../../../data/config'))
+    data = op(abspath(join('..', 'data', 'config')))
     valueRemoved = data[key]
     data.pop(key)
     data.close()
@@ -475,7 +475,7 @@ def translate(translator='deepl'):
     '''Abre uma página no navegador com a definição do texto selecionado com o cursor'''
 
     from os import popen
-    from os.path import abspath
+    from os.path import abspath, join
     from csv import writer
     from webbrowser import open as op
     from datetime import datetime
@@ -488,7 +488,8 @@ def translate(translator='deepl'):
                 }
     translatorsOnlyOneWord = ['linguee', 'cambridge']
 
-    with open(abspath('../../../data/translations.csv'), 'a') as file:
+    normalizePath()
+    with open(abspath(join('..', 'data', 'translations.csv')), 'a') as file:
         reader = writer(file)
         line = []
         text = getSelection(removeCharacters=(('\n', '\r'), ' '))
@@ -650,6 +651,12 @@ def writeText_automateNoSpace():
 def writeText_searchKeys_filetype():
     writeText('filetype:')
 
+def writeText_searchKeys_site():
+    writeText('site:')
+
+def writeText_searchKeys_site_reddit():
+    writeText('site:reddit.com')
+
 def runBrowser_bce_authorize():
     runBrowserStudy('http://minhabcedigital.bce.unb.br/ValidaAcessoEBSCO.aspx?biblio=minhabiblioteca&isbn=9788582714232')
 
@@ -717,6 +724,12 @@ def writeText_date():
 
 def writeText_cep():
     getAndWriteText('cep')
+
+def writeText_phone():
+    getAndWriteText('phone')
+
+def writeText_matricula():
+    getAndWriteText('matricula')
 
 def writeText_code_enterTODO():
     writeText('# TODO: ')
