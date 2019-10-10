@@ -449,7 +449,9 @@ def writeText(text):
 
 def writeText_screenshot_currentDirectory():
     from pyautogui import typewrite
-    text = data_get('printPath')
+    from time import sleep
+    text = str(data_get('printPath', isFileOrFolder=True))
+    sleep(0.5)
     typewrite(text)
 
 def getAndWriteText(key):
