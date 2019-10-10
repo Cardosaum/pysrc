@@ -249,6 +249,9 @@ def gthumbCopyAndPaste(typeOfCopy='removePrevious'):
                 pyautogui.press('backspace')
             if typeOfCopy == 'onlyPaste':
                 pyautogui.hotkey('ctrl', 'end')
+                pyautogui.hotkey('ctrl', 'end')
+                pyautogui.hotkey('ctrl', 'end')
+                pyautogui.hotkey('ctrl', 'end')
 
             # sleep(0.1)
             pyautogui.hotkey('ctrl', 'v')
@@ -414,8 +417,10 @@ def anki_add_print(mode='onlyPaste'):
             waitUntilWindowActivate('Add')
             [hotkey('tab') for g in range(2)]
             if mode == 'onlyPaste':
+                hotkey('ctrl', 'end')
                 hotkey('ctrl', 'shift', 'v')
             elif mode == 'removePrevious':
+                hotkey('ctrl', 'end')
                 hotkey('backspace')
                 hotkey('ctrl', 'shift', 'v')
             elif mode == 'removeAll':
@@ -440,6 +445,11 @@ def writeText(text):
     from pyautogui import typewrite
     from time import sleep
     sleep(0.2)
+    typewrite(text)
+
+def writeText_screenshot_currentDirectory():
+    from pyautogui import typewrite
+    text = data_get('printPath')
     typewrite(text)
 
 def getAndWriteText(key):
@@ -628,6 +638,7 @@ def browser_download_image():
 ##############
 # call scripts
 ##############
+
 
 def anki_add_print_removeAll():
     anki_add_print('removeAll')
