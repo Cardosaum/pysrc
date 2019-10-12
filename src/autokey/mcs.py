@@ -134,7 +134,7 @@ def getSelection(cleanString=False, removeCharacters=((), ' ')):
     from os import popen
     if cleanString:
         selection = popen('xclip -selection primary -o').read().replace('\n', ' ').strip()
-        charactersToRemove = ['.',',','`',':',';','\n','\r','&']
+        charactersToRemove = ['.',',',':',';','\n','\r','&']
         [selection.replace(character, ' ') for character in charactersToRemove]
     else:
         selection = popen('xclip -selection primary -o').read().strip('\n')
