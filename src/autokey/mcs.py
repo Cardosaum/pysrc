@@ -458,12 +458,20 @@ def getAndWriteText(key):
     writeText(getData(key))
 
 def runBrowser(url, browser='firefox'):
-    if browser != 'firefox':
-        from os import system
-        system(f"{browser} {url}")
-    else:
+    preferedBrowsers = [('firefox', '- Mozilla Firefox'), ('brave-browser', '- Brave')]
+    useDefaltBrowser = True
+
+    for browser in preferedBrowsers:
+        if isWindowActive(browser[1]):
+            useDefaltBrowser = False
+
+    if useDefaltBrowser:
         from webbrowser import open as op
         op(url)
+
+    else:
+        from os import system
+        system(f"{browser[0]} {url}")
 
 def runBrowserStudy(url):
     runBrowser(url, browser='brave-browser')
@@ -489,7 +497,6 @@ def translate(translator='deepl'):
     from os import popen
     from os.path import abspath, join
     from csv import writer
-    from webbrowser import open as op
     from datetime import datetime
     translators = {
                     'deepl': 'https://www.deepl.com/translator#en/pt/',
@@ -536,7 +543,7 @@ def translate(translator='deepl'):
         if translator == 'linguee':
             searchUrl = base + phrase + '.html'
 
-    op(searchUrl)
+    runBrowser(r'%20'.join(searchUrl.split()))
 
 def browseMap(mapProvider='googleMaps'):
     from webbrowser import open as op
