@@ -458,12 +458,17 @@ def getAndWriteText(key):
     writeText(getData(key))
 
 def runBrowser(url, browser='firefox'):
-    preferedBrowsers = [('firefox', '- Mozilla Firefox'), ('brave-browser', '- Brave')]
+    preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
     useDefaltBrowser = True
-
+    useThisBrowser = ''
     for browser in preferedBrowsers:
         if isWindowActive(browser[1]):
             useDefaltBrowser = False
+            if useThisBrowser:
+                if useThisBrowser[2] < browser[2]:
+                    useThisBrowser = browser
+            else:
+                useThisBrowser = browser
 
     if useDefaltBrowser:
         from webbrowser import open as op
@@ -471,7 +476,7 @@ def runBrowser(url, browser='firefox'):
 
     else:
         from os import system
-        system(f"{browser[0]} {url}")
+        system(f"{useThisBrowser[0]} {url}")
 
 def runBrowserStudy(url):
     runBrowser(url, browser='brave-browser')
@@ -520,7 +525,7 @@ def translate(translator='deepl'):
 
     base = translators[translator]
     phrase = getSelection(cleanString=True)
-    charactersToRemove = ['.',',','"',"'",':',';']
+    charactersToRemove = ['.',',',':',';']
     [phrase.strip(f) for f in charactersToRemove]
     singleWord = False
     if phrase.find(' ') < 0:
