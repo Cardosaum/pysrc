@@ -457,7 +457,7 @@ def writeText_screenshot_currentDirectory():
 def getAndWriteText(key):
     writeText(getData(key))
 
-def runBrowser(url, browser='firefox'):
+def runBrowser(url, browser='firefox', translator=False):
     preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
     useDefaltBrowser = True
     useThisBrowser = ''
@@ -476,7 +476,11 @@ def runBrowser(url, browser='firefox'):
 
     else:
         from os import system
-        system(f"{useThisBrowser[0]} {url}")
+        if translator:
+            system(f"{useThisBrowser[0]} \"{url}\"")
+
+        else:
+            system(f"{useThisBrowser[0]} {url}")
 
 def runBrowserStudy(url):
     runBrowser(url, browser='brave-browser')
@@ -543,12 +547,11 @@ def translate(translator='deepl'):
         if not singleWord:
             from os import system
             from sys import exit
-            system('zenity --notification  --window-icon=error --text "Selecione apenas uma palavra"')
+            system('zenity --notification  --window-icon=error --text "Select just one word"')
             exit(1)
         if translator == 'linguee':
             searchUrl = base + phrase + '.html'
-
-    runBrowser(r'%20'.join(searchUrl.split()))
+    runBrowser(searchUrl, translator=True)
 
 def browseMap(mapProvider='googleMaps'):
     from webbrowser import open as op
