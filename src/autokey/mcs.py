@@ -457,33 +457,43 @@ def writeText_screenshot_currentDirectory():
 def getAndWriteText(key):
     writeText(getData(key))
 
-def runBrowser(url, browser='firefox', translator=False):
-    preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
-    useDefaltBrowser = True
-    useThisBrowser = ''
-    for browser in preferedBrowsers:
-        if isWindowActive(browser[1]):
-            useDefaltBrowser = False
-            if useThisBrowser:
-                if useThisBrowser[2] < browser[2]:
-                    useThisBrowser = browser
-            else:
-                useThisBrowser = browser
-
-    if useDefaltBrowser:
-        from webbrowser import open as op
-        op(url)
+def runBrowser(url, mode='general', translator=False):
+    from collections import defaultdict
+    browserPreferences = defaultdict(dict)
+    browserPreferences['browser'] = {'brave-browser': {'command': 'brave-browser','pattern': '- Brave','preference': 9},'firefox': {'command': 'firefox','pattern': '- Mozilla Firefox','preference': 10}}
+    browserPreferences['mode']['study'] = {}
+    browserPreferences['mode']['study']['browser'] = browserPreferences["browser"]["brave-browser"]["command"]
+    if mode == 'study':
+        from os import system
+        system(f"{browserPreferences['mode']['study']['browser']} {url}")
 
     else:
-        from os import system
-        if translator:
-            system(f"{useThisBrowser[0]} \"{url}\"")
+        preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
+        useDefaltBrowser = True
+        useThisBrowser = ''
+        for browser in preferedBrowsers:
+            if isWindowActive(browser[1]):
+                useDefaltBrowser = False
+                if useThisBrowser:
+                    if useThisBrowser[2] < browser[2]:
+                        useThisBrowser = browser
+                else:
+                    useThisBrowser = browser
+
+        if useDefaltBrowser:
+            from webbrowser import open as op
+            op(url)
 
         else:
-            system(f"{useThisBrowser[0]} {url}")
+            from os import system
+            if translator:
+                system(f"{useThisBrowser[0]} \"{url}\"")
+
+            else:
+                system(f"{useThisBrowser[0]} {url}")
 
 def runBrowserStudy(url):
-    runBrowser(url, browser='brave-browser')
+    runBrowser(url, mode='study')
 
 def ppress(key):
     from pyautogui import press
