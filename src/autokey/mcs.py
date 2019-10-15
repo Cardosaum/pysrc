@@ -332,6 +332,10 @@ def waitUntilWindowActivate(pattern):
             else:
                 pass
 
+##########
+## Anki ##
+##########
+
 def anki_add_htmlEditor_open():
     if getActiveWindow() == 'HTML Editor':
         pass
@@ -440,6 +444,78 @@ def anki_add_print(mode='onlyPaste'):
             alert(title='Anki ERROR', text="'Add' is closed!\nPlease, open it first.", button='OK!')
     else:
         pass
+
+def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPics=True, countAllCards=False):
+    from subprocess import getoutput
+    from subprocess import sys
+    plataform = sys.platform
+
+    if plataform == 'linux':
+        flavor, version = getoutput('lsb_release -d').split(':')[-1].strip().lower().split()
+        version = float(version)
+        if flavor == 'ubuntu':
+            if version >= 19.00:
+                if not countAllCards:
+                    fd = f'fdfind --change-newer-than {nOfWeeks}weeks --type file --search-path {dirPath}'
+                else:
+                    fd = f'fdfind --type file --search-path {dirPath}'
+        else:
+            if not countAllCards:
+                fd = f'fd --change-newer-than {nOfWeeks}weeks --type file --search-path {dirPath}'
+            else:
+                fd = f'fd --type file --search-path {dirPath}'
+        files = getoutput(fd).splitlines()
+
+        filesPerDirectory = {}
+        import os
+        for file in files:
+            dirName, baseName = os.path.split(file)
+            dirName = dirName.split(os.path.sep)
+            a = dirName.index('pendingFlashcards')
+            tempDir = f'{os.path.sep}'.join(dirName[a+1:])
+            filesPerDirectory.setdefault(tempDir, 0)
+            filesPerDirectory[f'{tempDir}'] = '{:02d}'.format(int(filesPerDirectory[f'{tempDir}'])+1)
+
+        maxLen = 0
+        orderPics = []
+        for k, v in filesPerDirectory.items():
+            if maxLen < len(k):
+                maxLen = len(k)
+        if orderPerNumberOfPendingPics:
+            orderPics = sorted(filesPerDirectory.items(), key=lambda kv: kv[1], reverse=True)
+        else:
+            orderPics = sorted(filesPerDirectory.items(), key=lambda kv: kv[0], reverse=False)
+
+        sumary = []
+        for item in orderPics:
+            # sumary.append(str(item[0].ljust(maxLen, '.')+str(item[1]).rjust(5)))
+            sumary.append(str(f'<code>{item[1]}</code>. <i>{item[0]}</i>'))
+
+        sumary = '\n'.join(sumary)
+        message = f"You have <b>{len(files)}</b> screenshots of the last <b>{nOfWeeks}</b> weeks waiting to become cards!"
+        text = f'{message}\n\n{sumary}'
+        tg_bot(data_get('tg_bots_mike_token'), data_get('tg_bots_chatID_mcs'), text)
+
+        return text
+    else:
+        raise SystemError
+
+
+############
+##Telegram##
+############
+
+def tg_bot(bot_token, chatID, message):
+    import requests
+
+    baseUrl = f'https://api.telegram.org/bot{bot_token[0]}/sendMessage?chat_id={chatID[0]}&parse_mode=HTML&text='
+    sendMessage = f'{baseUrl}{message}'
+    response = requests.get(sendMessage)
+
+    return response.json()
+
+
+
 
 def writeText(text):
     from pyautogui import typewrite
