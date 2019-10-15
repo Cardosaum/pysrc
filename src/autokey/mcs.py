@@ -838,7 +838,7 @@ def writeText_bce_shibolet():
 
 def writeText_date():
     from datetime import datetime
-    typewrite(f"{datetime.now().strftime('%Y-%m-%d')}-")
+    writeText(f"{datetime.now().strftime('%Y-%m-%d')}-")
 
 def writeText_cep():
     getAndWriteText('cep')
