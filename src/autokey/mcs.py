@@ -222,23 +222,34 @@ def activateWindow(windowPattern):
     window = getWindowInfo(windowPattern, moreInfo=True)
     system(f'wmctrl -ia {window[1][1]}')
 
-
-def gthumbCopyAndPaste(typeOfCopy='removePrevious'):
+### deprecated ###
+def gthumbCopyAndPaste(typeOfCopy='removePrevious', usemouse=True, numberOfField=1):
 
     if getActiveWindow() == 'gThumb':
         import pyautogui
         from time import sleep
         pyautogui.PAUSE = 0.1
-
-        if 'Add' in getWindowInfo('Add'):
+        addInfo = getWindowInfo('Add', moreInfo=True, exactMatch=True)
+        if 'Add' in addInfo:
             sleep(0.2)
             pyautogui.hotkey('ctrl', 'c')
             activateWindow('Add')
             sleep(0.5)
             pyautogui.hotkey('ctrl', 'shift', 't')
-            for f in range(12):
-                pyautogui.hotkey('tab')
-                # sleep(0.1)
+            if not usemouse:
+                for f in range(12):
+                    pyautogui.hotkey('tab')
+                    # sleep(0.1)
+            else:
+                for f in range(2):
+                    pyautogui.hotkey('shift', 'tab')
+                mouse_x = addInfo[1][3] + 100
+                mouse_y = addInfo[1][4] + 100
+                pyautogui.scroll(50)
+                pyautogui.click(x=mouse_x, y=mouse_y)
+                if numberOfField > 1:
+                    for f in range(numberOfField-1):
+                        pyautogui.hotkey('tab')
 
             if typeOfCopy == 'removePrevious':
                 pyautogui.hotkey('ctrl', 'end')
@@ -410,16 +421,24 @@ def anki_add_htmlEditor_pasteImageFrom_gThumb(mode='write'):
         exit(1)
 
 
-def anki_add_print(mode='onlyPaste'):
+def anki_add_print(mode='onlyPaste', usemouse=True, numberOfField=3, simpleMode=True):
     if getActiveWindow() == 'gThumb':
         if isWindowActive('Add'):
-            from pyautogui import PAUSE, hotkey
-            PAUSE = 0.3
+            from pyautogui import hotkey, scroll, click
             from time import sleep
             sleep(0.6)
             hotkey('ctrl', 'c')
             waitUntilWindowActivate('Add')
-            [hotkey('tab') for g in range(2)]
+            if simpleMode:
+                [hotkey('tab') for g in range(numberOfField-1)]
+            else:
+                addInfo = getWindowInfo('Add', moreInfo=True, exactMatch=True)
+                mouse_x = float(addInfo[1][3]) + 100
+                mouse_y = float(addInfo[1][4]) + 100
+                scroll(50, x=mouse_x, y=mouse_y)
+                click()
+            if numberOfField > 1:
+                [hotkey('tab') for g in range(numberOfField-1)]
             if mode == 'onlyPaste':
                 hotkey('ctrl', 'end')
                 hotkey('ctrl', 'shift', 'v')
@@ -429,15 +448,17 @@ def anki_add_print(mode='onlyPaste'):
                 hotkey('ctrl', 'shift', 'v')
             elif mode == 'removeAll':
                 hotkey('ctrl', 'a')
-                hotkey('backspace')
-                [hotkey('backspace') for r in range(3)]
+                hotkey('del')
+                # [hotkey('backspace') for r in range(3)] # free to remove
                 hotkey('ctrl', 'shift', 'v')
             else:
                 pass
-            [hotkey('shift', 'tab') for f in range(2)]
-            [hotkey('pageup') for i in range(3)]
+
+            # return to first field
+            [hotkey('shift', 'tab') for g in range(numberOfField-1)]
+            scroll(50, x=(int(addInfo[1][5])-25), y=mouse_y)
+            # [hotkey('pageup') for i in range(3)] # free to remove
             hotkey('ctrl', 'end')
-            PAUSE = 0.1
 
         else:
             from pyautogui import alert
@@ -746,13 +767,13 @@ def browser_download_image():
 
 
 def anki_add_print_removeAll():
-    anki_add_print('removeAll')
+    anki_add_print('removeAll', simpleMode=False)
 
 def anki_add_print_onlyPaste():
-    anki_add_print('onlyPaste')
+    anki_add_print('onlyPaste', simpleMode=False)
 
 def anki_add_print_removePrevious():
-    anki_add_print('removePrevious')
+    anki_add_print('removePrevious', simpleMode=False)
 
 def anki_screenshot_notification_startup():
     anki_screenshot_notification('/home/matheus/mcs/study/anki/pics/pendingFlashcards/')
