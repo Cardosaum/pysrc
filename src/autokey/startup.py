@@ -2,7 +2,7 @@
 Script to run on every startup
 '''
 
-import platform, socket, re, uuid, json, psutil, pyautogui, os, pwd, subprocess, sys, mcs
+import platform, socket, re, uuid, json, psutil, pyautogui, os, pwd, subprocess, sys, mcs, time, pyperclip
 
 
 def get_system_info():
@@ -37,11 +37,12 @@ if system_info['platform'] == 'Linux':
     # Check in what computer the script is running
     if system_info['hostname'] == 'uracila':
         if get_username() == 'mcsouza':
-            mcs.waitUntilWindowActivate('Konsole')
 
-            # # set correct time
+            print(os.path.split(sys.argv[0]))
+            # set correct time
             # mcs.waitUntilWindowActivate('Konsole')
-            # mcs.writeText('''sudo date -s "$(wget -qSO- --max-redirect=0 google.com 2>&1 | grep Date: | cut -d' ' -f5-8)Z"''')
+            # mcs.writeText('sudo su')
+            # pyautogui.press('enter')
 
 
         else:

@@ -1,3 +1,4 @@
 pyautogui
 psutil
 uuid
+pyperclip
