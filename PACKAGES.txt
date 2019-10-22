@@ -1,0 +1,8 @@
+xdotool
+maim
+yad
+scrot
+wmctrl
+gthumb
+firefox
+flameshot
