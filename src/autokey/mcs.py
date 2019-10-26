@@ -3,43 +3,36 @@ Custom Scripts made by Matheus
 Intended to work with autokey
 '''
 
+import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys
+
 def executeScript(scriptName):
     logFunction(scriptName)
     eval(f'{scriptName}()')
 
 def logFunction(scriptName):
-    from os.path import abspath, join
-    from datetime import datetime
     normalizePath()
     stats = []
-    n = datetime.now()
+    n = datetime.datetime.now()
     stats.append(n.strftime('%s')) # get time
     stats.append(scriptName) # name of the script
     stats.append(getActiveWindow())
-    callsFile = abspath(join('..', 'data', 'calls.csv'))
+    callsFile = os.path.abspath(os.path.join('..', 'data', 'calls.csv'))
     with open(callsFile, 'a') as file:
-        from csv import writer
-        w = writer(file)
+        w = csv.writer(file)
         w.writerow(stats)
 
 def normalizePath():
-    from os import chdir
-    from os.path import abspath, join, realpath
-    chdir(realpath(abspath(join(getHome(), 'src'))))
+    os.chdir(os.path.realpath(os.path.abspath(os.path.join(getHome(), 'src'))))
 
 def getPrintPath():
-    from os.path import abspath, join
-    from shelve import open as op
     normalizePath()
-    data = op(abspath(join('..', 'data', 'config')))
+    data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
     printPath = data['printPath']
     data.close()
     return printPath
 
 def getData(key, returnString=True):
-    from os.path import abspath, expanduser, join
-    from shelve import open as op
-    data = op(abspath(join('..', 'data', 'config')))
+    data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
     dataNeeded = data[key]
     data.close()
     if returnString:
@@ -48,11 +41,8 @@ def getData(key, returnString=True):
         return dataNeeded
 
 def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=False):
-    from os.path import abspath, expanduser, join, sep, exists, relpath
-    from os import chdir, getcwd
-    from shelve import open as op
     normalizePath()
-    with op(abspath(join('..', 'data', 'config'))) as f:
+    with shelve.open(os.path.abspath(os.path.join('..', 'data', 'config'))) as f:
 
         if key:
             value = f[key]
@@ -60,13 +50,13 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
                 if isFileOrFolder:
                     if needTostartWithHome:
                         if value.startswith(getHome()):
-                            if exists(value):
+                            if os.path.exists(value):
                                 pass
                             else:
                                 raise LookupError
                         else:
                             value = value.split(sep)
-                            value = f'{getHome()}{sep.join(value)}'
+                            value = f'{getHome()}{os.path.sep.join(value)}'
                         return value
                     else:
                         return value
@@ -76,43 +66,36 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
             return list(f.items())
 
 def saveData(key, value):
-    from os.path import abspath, expanduser, join
     normalizePath()
-    from shelve import open as op
-    data = op(abspath(join('..', 'data', 'config')))
+    data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
     data[key] = value
     dataSaved = data[key]
     data.close()
     return dataSaved
 
 def removeData(key):
-    from os.path import abspath, expanduser, join
-    from os import chdir, getcwd
-    pwd = getcwd()
-    home = expanduser('~')
+    pwd = os.getcwd()
+    home = os.path.expanduser('~')
     rootFolderForScripts = data_get('rootFolderForScripts', isFileOrFolder=True, needTostartWithHome=True)
-    chdir(rootFolderForScripts)
-    from shelve import open as op
-    data = op(abspath(join('..', 'data', 'config')))
+    os.chdir(rootFolderForScripts)
+    data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
     valueRemoved = data[key]
     data.pop(key)
     data.close()
-    chdir(pwd)
+    os.chdir(pwd)
     return valueRemoved
 
 
 
 def getListOfWindows():
-    from os import popen
-    windows = popen('wmctrl -lG').read().strip('\n')
+    windows = os.popen('wmctrl -lG').read().strip('\n')
     windows = windows.splitlines()
 
     return windows
 
 
 def getActiveWindow():
-    from os import popen
-    active = popen('xdotool getactivewindow getwindowname').read().strip('\n')
+    active = os.popen('xdotool getactivewindow getwindowname').read().strip('\n')
 
     return active
 
@@ -125,19 +108,17 @@ def isWindowActive(pattern):
     return isWindowActive
 
 def getHome():
-    from os.path import expanduser
-    home = expanduser('~')
+    home = os.path.expanduser('~')
 
     return home
 
 def getSelection(cleanString=False, removeCharacters=((), ' ')):
-    from os import popen
     if cleanString:
-        selection = popen('xclip -selection primary -o').read().replace('\n', ' ').strip()
+        selection = os.popen('xclip -selection primary -o').read().replace('\n', ' ').strip()
         charactersToRemove = ['.',',',':',';','\n','\r','&']
         [selection.replace(character, ' ') for character in charactersToRemove]
     else:
-        selection = popen('xclip -selection primary -o').read().strip('\n')
+        selection = os.popen('xclip -selection primary -o').read().strip('\n')
     if removeCharacters and cleanString == False:
         for character in removeCharacters[0]:
             selection.replace(character, removeCharacters[1])
@@ -146,7 +127,6 @@ def getSelection(cleanString=False, removeCharacters=((), ' ')):
     return selection
 
 def getWindowInfo(windowPattern, moreInfo=False, exactMatch=False):
-    import re
     resultSimple = 0
 
     windowRegex = re.compile(r'{}'.format(windowPattern))
@@ -218,23 +198,20 @@ def windowExist(pattern):
 
 
 def activateWindow(windowPattern):
-    from os import system
     window = getWindowInfo(windowPattern, moreInfo=True)
-    system(f'wmctrl -ia {window[1][1]}')
+    os.system(f'wmctrl -ia {window[1][1]}')
 
 ### deprecated ###
 def gthumbCopyAndPaste(typeOfCopy='removePrevious', usemouse=True, numberOfField=1):
 
     if getActiveWindow() == 'gThumb':
-        import pyautogui
-        from time import sleep
         pyautogui.PAUSE = 0.1
         addInfo = getWindowInfo('Add', moreInfo=True, exactMatch=True)
         if 'Add' in addInfo:
-            sleep(0.2)
+            time.sleep(0.2)
             pyautogui.hotkey('ctrl', 'c')
             activateWindow('Add')
-            sleep(0.5)
+            time.sleep(0.5)
             pyautogui.hotkey('ctrl', 'shift', 't')
             if not usemouse:
                 for f in range(12):
@@ -275,9 +252,9 @@ def gthumbCopyAndPaste(typeOfCopy='removePrevious', usemouse=True, numberOfField
             pyautogui.hotkey('end')
         else:
             pyautogui.alert(title='Anki ERROR', text="'Add' is closed!\nPlease, open it first.", button='OK!')
-            exit()
+            sys.exit()
     else:
-        exit()
+        sys.exit()
 
 def gthumbCopyImageWithMouse():
     if getActiveWindow() == 'gThumb':
@@ -289,7 +266,6 @@ def gthumbCopyImageWithMouse():
             print('ERROR: gThumb is not active window')
             raise NameError
 
-    import pyautogui
     pyPause = pyautogui.PAUSE
     # pyautogui.PAUSE = 0.3
     gthumbWindowInfo = getWindowInfo('gThumb', moreInfo=True)
@@ -306,7 +282,6 @@ def gthumbCopyImageWithMouse():
 
 
 def gthumbCopyImageWithKeyboard(manipulateCopy=False, restoreClipboard=True, onlyBasename=False):
-    import pyperclip
     if restoreClipboard:
         oldClipboard = pyperclip.paste()
     if getActiveWindow() == 'gThumb':
@@ -318,7 +293,6 @@ def gthumbCopyImageWithKeyboard(manipulateCopy=False, restoreClipboard=True, onl
             print('ERROR: gThumb is not active window')
             raise NameError
 
-    import pyautogui
     pyPause = pyautogui.PAUSE
     # pyautogui.PAUSE = 0.3
     pyautogui.hotkey('ctrl', 'c')
@@ -327,18 +301,16 @@ def gthumbCopyImageWithKeyboard(manipulateCopy=False, restoreClipboard=True, onl
     if restoreClipboard:
         pyperclip.copy(oldClipboard)
     if onlyBasename:
-        from os.path import basename
-        copiedImage = basename(copiedImage)
+        copiedImage = os.paht.basename(copiedImage)
     return copiedImage
 
 
 def waitUntilWindowActivate(pattern):
-    from time import sleep
     for f in range(3):
         for window in getListOfWindows():
             if pattern in window:
                 while not pattern in getActiveWindow():
-                    sleep(0.3)
+                    time.sleep(0.3)
                     activateWindow(pattern)
             else:
                 pass
@@ -356,21 +328,14 @@ def anki_add_htmlEditor_open():
         if windowExist('HTML Editor') == False:
             if windowExist('Add'):
                 waitUntilWindowActivate('Add')
-                import pyautogui
                 pyautogui.hotkey('ctrl', 'shift', 'x')
                 waitUntilWindowActivate('HTML Editor')
             if windowExist('Add') == False:
-                from pyautogui import alert
-                alert(title='Anki ERROR', text="'Add' is closed!\nPlease, open it first.", button='OK!')
+                pyautogui.alert(title='Anki ERROR', text="'Add' is closed!\nPlease, open it first.", button='OK!')
 
 
 
 def anki_add_htmlEditor_write(text, mode='write', isImage=False, isDiferentDesktop=False):
-    import pyautogui
-    # from pyautogui import hotkey, typewrite, press
-    # from time import sleep
-    # print(isDiferentDesktop)
-    # sleep(7)
     pyautogui.PAUSE = 0.3
     activateWindow('Add')
     if isDiferentDesktop:
@@ -415,66 +380,58 @@ def anki_add_htmlEditor_pasteImageFrom_gThumb(mode='write'):
         isDiferentDesktop = (not gthumbWindowInfo[1][2] == addWindowInfo[1][2]) or (not addWindowInfo[1][2] == activeWindiwInfo[1][2])
         anki_add_htmlEditor_write(gthumbCopyImageWithKeyboard(onlyBasename=True), isImage=True, isDiferentDesktop=isDiferentDesktop, mode=mode)
     else:
-        from pyautogui import alert
-        alert(title='Anki ERROR', text="'Add' and/or 'gThumb' are closed!\nPlease, open it first.", button='OK!')
-        from sys import exit
-        exit(1)
+        pyautogui.alert(title='Anki ERROR', text="'Add' and/or 'gThumb' are closed!\nPlease, open it first.", button='OK!')
+        sys.exit(1)
 
 
 def anki_add_print(mode='onlyPaste', usemouse=True, numberOfField=3, simpleMode=True):
     if getActiveWindow() == 'gThumb':
         if isWindowActive('Add'):
-            from pyautogui import hotkey, scroll, click
-            from time import sleep
-            sleep(0.6)
-            hotkey('ctrl', 'c')
+            time.sleep(0.6)
+            pyautogui.hotkey('ctrl', 'c')
             waitUntilWindowActivate('Add')
             if simpleMode:
-                [hotkey('tab') for g in range(numberOfField-1)]
+                [pyautogui.hotkey('tab') for g in range(numberOfField-1)]
             else:
                 addInfo = getWindowInfo('Add', moreInfo=True, exactMatch=True)
                 mouse_x = float(addInfo[1][3]) + 100
                 mouse_y = float(addInfo[1][4]) + 100
-                scroll(50, x=mouse_x, y=mouse_y)
-                click()
+                pyautogui.scroll(50, x=mouse_x, y=mouse_y)
+                pyautogui.click()
             if numberOfField > 1:
-                [hotkey('tab') for g in range(numberOfField-1)]
+                [pyautogui.hotkey('tab') for g in range(numberOfField-1)]
             if mode == 'onlyPaste':
-                hotkey('ctrl', 'end')
-                hotkey('ctrl', 'shift', 'v')
+                pyautogui.hotkey('ctrl', 'end')
+                pyautogui.hotkey('ctrl', 'shift', 'v')
             elif mode == 'removePrevious':
-                hotkey('ctrl', 'end')
-                hotkey('backspace')
-                hotkey('ctrl', 'shift', 'v')
+                pyautogui.hotkey('ctrl', 'end')
+                pyautogui.hotkey('backspace')
+                pyautogui.hotkey('ctrl', 'shift', 'v')
             elif mode == 'removeAll':
-                hotkey('ctrl', 'a')
-                hotkey('del')
+                pyautogui.hotkey('ctrl', 'a')
+                pyautogui.hotkey('del')
                 # [hotkey('backspace') for r in range(3)] # free to remove
-                hotkey('ctrl', 'shift', 'v')
+                pyautogui.hotkey('ctrl', 'shift', 'v')
             else:
                 pass
 
             # return to first field
-            [hotkey('shift', 'tab') for g in range(numberOfField-1)]
-            scroll(50, x=(int(addInfo[1][5])-25), y=mouse_y)
+            [pyautogui.hotkey('shift', 'tab') for g in range(numberOfField-1)]
+            pyautogui.scroll(50, x=(int(addInfo[1][5])-25), y=mouse_y)
             # [hotkey('pageup') for i in range(3)] # free to remove
-            hotkey('ctrl', 'end')
+            pyautogui.hotkey('ctrl', 'end')
 
         else:
-            from pyautogui import alert
-            alert(title='Anki ERROR', text="'Add' is closed!\nPlease, open it first.", button='OK!')
+            pyautogui.alert(title='Anki ERROR', text="'Add' is closed!\nPlease, open it first.", button='OK!')
     else:
         pass
 
 def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPics=True, countAllCards=False):
-    from subprocess import getoutput
-    from subprocess import sys
-    from time import sleep
-    sleep(600)
-    plataform = sys.platform
+    time.sleep(600)
+    plataform = subprocess.sys.platform
 
     if plataform == 'linux':
-        flavor, version = getoutput('lsb_release -d').split(':')[-1].strip().lower().split()
+        flavor, version = subprocess.getoutput('lsb_release -d').split(':')[-1].strip().lower().split()
         version = float(version)
         if flavor == 'ubuntu':
             if version >= 19.00:
@@ -487,10 +444,9 @@ def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPic
                 fd = f'fd --change-newer-than {nOfWeeks}weeks --type file --search-path {dirPath}'
             else:
                 fd = f'fd --type file --search-path {dirPath}'
-        files = getoutput(fd).splitlines()
+        files = subprocess.getoutput(fd).splitlines()
 
         filesPerDirectory = {}
-        import os
         for file in files:
             dirName, baseName = os.path.split(file)
             dirName = dirName.split(os.path.sep)
@@ -529,7 +485,6 @@ def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPic
 ############
 
 def tg_bot(bot_token, chatID, message):
-    import requests
 
     baseUrl = f'https://api.telegram.org/bot{bot_token[0]}/sendMessage?chat_id={chatID[0]}&parse_mode=HTML&text='
     sendMessage = f'{baseUrl}{message}'
@@ -541,30 +496,24 @@ def tg_bot(bot_token, chatID, message):
 
 
 def writeText(text):
-    from pyautogui import typewrite
-    from time import sleep
-    sleep(0.2)
-    typewrite(text)
+    time.sleep(0.2)
+    pyautogui.typewrite(text)
 
 def writeText_screenshot_currentDirectory():
-    from pyautogui import typewrite
-    from time import sleep
     text = str(data_get('printPath', isFileOrFolder=True))
-    sleep(0.5)
-    typewrite(text)
+    time.sleep(0.5)
+    pyautogui.typewrite(text)
 
 def getAndWriteText(key):
     writeText(getData(key))
 
 def runBrowser(url, mode='general', translator=False):
-    from collections import defaultdict
-    browserPreferences = defaultdict(dict)
+    browserPreferences = collections.defaultdict(dict)
     browserPreferences['browser'] = {'brave-browser': {'command': 'brave-browser','pattern': '- Brave','preference': 9},'firefox': {'command': 'firefox','pattern': '- Mozilla Firefox','preference': 10}}
     browserPreferences['mode']['study'] = {}
     browserPreferences['mode']['study']['browser'] = browserPreferences["browser"]["brave-browser"]["command"]
     if mode == 'study':
-        from os import system
-        system(f"{browserPreferences['mode']['study']['browser']} {url}")
+        os.system(f"{browserPreferences['mode']['study']['browser']} {url}")
 
     else:
         preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
@@ -580,42 +529,32 @@ def runBrowser(url, mode='general', translator=False):
                     useThisBrowser = browser
 
         if useDefaltBrowser:
-            from webbrowser import open as op
-            op(url)
+            webbrowser.open(url)
 
         else:
-            from os import system
             if translator:
-                system(f"{useThisBrowser[0]} \"{url}\"")
+                os.system(f"{useThisBrowser[0]} \"{url}\"")
 
             else:
-                system(f"{useThisBrowser[0]} {url}")
+                os.system(f"{useThisBrowser[0]} {url}")
 
 def runBrowserStudy(url):
     runBrowser(url, mode='study')
 
 def ppress(key):
-    from pyautogui import press
-    press(key)
+    pyautogui.press(key)
 
 def runScript(scriptName):
-    from os import chdir, system, getcwd
-    from os.path import abspath
     normalizePath()
-    chdir(abspath(f'{getcwd()}/src/autokey/'))
-    system(f'python {scriptName}')
+    os.chdir(os.path.abspath(f'{os.getcwd()}/src/autokey/'))
+    os.system(f'python {scriptName}')
 
 def runCommand(command):
-    from os import system
-    system(command)
+    os.system(command)
 
 def translate(translator='deepl'):
     '''Abre uma página no navegador com a definição do texto selecionado com o cursor'''
 
-    from os import popen
-    from os.path import abspath, join
-    from csv import writer
-    from datetime import datetime
     translators = {
                     'deepl': 'https://www.deepl.com/translator#en/pt/',
                     'linguee': 'https://www.linguee.com/english-portuguese/translation/',
@@ -626,11 +565,11 @@ def translate(translator='deepl'):
     translatorsOnlyOneWord = ['linguee', 'cambridge']
 
     normalizePath()
-    with open(abspath(join('..', 'data', 'translations.csv')), 'a') as file:
-        reader = writer(file)
+    with open(os.path.abspath(os.path.join('..', 'data', 'translations.csv')), 'a') as file:
+        reader = csv.writer(file)
         line = []
         text = getSelection(removeCharacters=(('\n', '\r'), ' '))
-        n = datetime.now()
+        n = datetime.datetime.now()
         line.append(n.strftime('%s')) # get time
         line.append(text)
         line.append(getActiveWindow())
@@ -654,26 +593,22 @@ def translate(translator='deepl'):
             searchUrl = base + phrase
     if translator in translatorsOnlyOneWord:
         if not singleWord:
-            from os import system
-            from sys import exit
-            system('zenity --notification  --window-icon=error --text "Select just one word"')
-            exit(1)
+            os.system('zenity --notification  --window-icon=error --text "Select just one word"')
+            sys.exit(1)
         if translator == 'linguee':
             searchUrl = base + phrase + '.html'
     runBrowser(searchUrl, translator=True)
 
 def browseMap(mapProvider='googleMaps'):
-    from webbrowser import open as op
     maps = {
             'googleMaps': 'https://www.google.com.br/maps/search/',
             'openStreet': 'https://www.openstreetmap.org/search?query='
         }
     address = getSelection(cleanString=True)
     searchUrl = maps[mapProvider] + address
-    op(searchUrl)
+    webbrowser.open(searchUrl)
 
 def browseSearch(searchProvider='ddg'):
-    from webbrowser import open as op
     searchProviders = {
                         'ddg': 'https://duckduckgo.com/?q=',
                         'google': ''
@@ -681,11 +616,9 @@ def browseSearch(searchProvider='ddg'):
 
     search = getSelection(cleanString=True)
     searchUrl = searchProviders[searchProvider] + search
-    op(searchUrl)
+    webbrowser.open(searchUrl)
 
 def browseOpenUrl():
-    from webbrowser import open as op
-    import re
     regex = re.compile(
         r'^(?:http|ftp)s?://' # http:// or https://
         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
@@ -695,71 +628,73 @@ def browseOpenUrl():
         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
     url = getSelection()
     if regex.search(url) is not None:
-        op(url)
+        webbrowser.open(url)
     else:
-        import pyperclip
         url = pyperclip.paste()
         if regex.search(url) is not None:
-            op(url)
+            webbrowser.open(url)
         else:
-            from os import system
-            system('zenity --notification  --window-icon=error --text "Select a valid URL"')
+            os.system('zenity --notification  --window-icon=error --text "Select a valid URL"')
 
 def takeScreenshot(playSound=False, program='maim', mode='region'):
-    from os import system, chdir
-    chdir(getPrintPath())
+    os.chdir(getPrintPath())
     if program == 'maim':
         if mode == 'region':
             command = "maim -s --hidecursor $(date +%Y-%m-%d_%H-%M-%S_%s)_maim.png"
         elif mode == 'active':
             pass
-        system(f"sleep 0.2 ; {command}")
+        os.system(f"sleep 0.2 ; {command}")
     if program == 'flameshot':
         if mode == 'region':
             command = f'flameshot gui -p {getPrintPath()}'
         elif mode == 'active':
             pass
-        system(command)
+        os.system(command)
     if program == 'scrot':
         if mode == 'activeWinow':
             command = f"scrot -u '%Y-%m-%d_%H-%M-%S_%s_scrot.png'"
-            system(f"sleep 0.2 ; {command}")
+            os.system(f"sleep 0.2 ; {command}")
     if playSound:
         soundPath = data_get('cameraSound', isFileOrFolder=True, needTostartWithHome=True)
         soundCommand = 'audacious -qH'
-        system(f'{soundCommand} {soundPath}')
+        os.system(f'{soundCommand} {soundPath}')
 
 def setPrintPath():
-    from os import popen, chdir
-    chdir(data_get('path_root_pendingFlashcards', isFileOrFolder=True, needTostartWithHome=True))
+    os.chdir(data_get('path_root_pendingFlashcards', isFileOrFolder=True, needTostartWithHome=True))
     windowGeometry = '--maximized'
-    path = popen(f'yad --file --directory {windowGeometry} --title="Anki - Choose Folder to Save Prints"').read().strip()
+    path = os.popen(f'yad --file --directory {windowGeometry} --title="Anki - Choose Folder to Save Prints"').read().strip()
     saveData('printPath', path)
     return f'{path+"/"}'
 
 def browser_copyLink():
     if isWindowActive('- Mozilla Firefox'):
         waitUntilWindowActivate('- Mozilla Firefox')
-        from pyautogui import hotkey, press
-        hotkey('ctrl', 'l')
-        hotkey('ctrl', 'c')
-        [press('tab') for f in range(3)]
+        pyautogui.hotkey('ctrl', 'l')
+        pyautogui.hotkey('ctrl', 'c')
+        [pyautogui.press('tab') for f in range(3)]
     else:
         pass
 
 def browser_download_image():
-    from os import chdir, system, popen
-    from datetime import datetime
-    from pyperclip import paste
-    chdir(data_get('path_anki_prints_organize', isFileOrFolder=True, needTostartWithHome=True))
+    os.chdir(data_get('path_anki_prints_organize', isFileOrFolder=True, needTostartWithHome=True))
     try:
-        url = paste()
-        name = datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%s_wget.png')
-        result = popen(f"wget -t 5 --https-only \'{url}\' --output-document={name}").read()
-        system(f'notify-send -i firefox -t 1000 "image downloaded" "{result}"')
-        system(f'feh {name}')
+        url = pyperclip.paste()
+        name = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%s_wget.png')
+        result = os.popen(f"wget -t 5 --https-only \'{url}\' --output-document={name}").read()
+        os.system(f'notify-send -i firefox -t 1000 "image downloaded" "{result}"')
+        os.system(f'feh {name}')
     except:
-        system(f'notify-send -i error -t 3000 "error while downloading image"')
+        os.system(f'notify-send -i error -t 3000 "error while downloading image"')
+
+
+
+############
+## rclone ##
+############
+
+def rclone_is_running():
+    # TODO:
+    pass
 
 ##############
 # call scripts
@@ -858,8 +793,7 @@ def writeText_bce_shibolet():
     ppress('enter')
 
 def writeText_date():
-    from datetime import datetime
-    writeText(f"{datetime.now().strftime('%Y-%m-%d')}-")
+    writeText(f"{datetime.datetime.now().strftime('%Y-%m-%d')}-")
 
 def writeText_cep():
     getAndWriteText('cep')

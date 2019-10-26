@@ -30,7 +30,7 @@ def cmd(command):
     return result
 
 system_info = get_system_info()
-
+print(system_info)
 # Currently only support Linux
 if system_info['platform'] == 'Linux':
 
@@ -39,14 +39,12 @@ if system_info['platform'] == 'Linux':
         if get_username() == 'mcsouza':
 
             print(os.path.split(sys.argv[0]))
-            # set correct time
-            # mcs.waitUntilWindowActivate('Konsole')
-            # mcs.writeText('sudo su')
-            # pyautogui.press('enter')
 
 
         else:
         	pass
+    elif system_info['hostname'] == 'matheus-acer':
+        if get_username() == 'matheus':
 
     else:
         pass
