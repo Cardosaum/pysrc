@@ -903,6 +903,9 @@ def writeText_logradouro():
 def writeText_gmail():
     getAndWriteText('gmail')
 
+def writeText_email_mcs_unb_outlook():
+    getAndWriteText('email_mcs_unb_outlook')
+
 def run_webgrafia():
     runScript('run_webgrafia.py')
 
