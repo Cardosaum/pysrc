@@ -46,7 +46,7 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
 
         if key:
             value = f[key]
-            if sep in value:
+            if os.path.sep in value:
                 if isFileOrFolder:
                     if needTostartWithHome:
                         if value.startswith(getHome()):
@@ -55,12 +55,12 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
                             else:
                                 raise LookupError
                         else:
-                            value = value.split(sep)
+                            value = value.split(os.path.sep)
                             value = f'{getHome()}{os.path.sep.join(value)}'
                         return value
                     else:
                         return value
-            return value, sep
+            return value, os.path.sep
 
         if list_keys:
             return list(f.items())
