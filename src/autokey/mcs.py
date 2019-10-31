@@ -515,50 +515,30 @@ def writeText(text):
     time.sleep(0.2)
     pyautogui.typewrite(text)
 
+
 def writeText_screenshot_currentDirectory():
     text = str(data_get('printPath', isFileOrFolder=True))
     time.sleep(0.5)
     pyautogui.typewrite(text)
 
+
 def getAndWriteText(key):
     writeText(getData(key))
+
 
 def runBrowser(url, mode='general', translator=False, browser_already_open=False):
     ''' Selectvly open browser '''
 
-    if browser_already_open:
-        browserPreferences = collections.defaultdict(dict)
-        browserPreferences['browser'] = {'brave-browser': {'command': 'brave-browser','pattern': '- Brave','preference': 9},'firefox': {'command': 'firefox','pattern': '- Mozilla Firefox','preference': 10}}
-        browserPreferences['mode']['study'] = {}
-        browserPreferences['mode']['study']['browser'] = browserPreferences["browser"]["brave-browser"]["command"]
-        if mode == 'study':
-            os.system(f"{browserPreferences['mode']['study']['browser']} {url}")
-
-        else:
-            preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
-            useDefaltBrowser = True
-            useThisBrowser = ''
-            for browser in preferedBrowsers:
-                if isWindowActive(browser[1]):
-                    useDefaltBrowser = False
-                    if useThisBrowser:
-                        if useThisBrowser[2] < browser[2]:
-                            useThisBrowser = browser
-                    else:
-                        useThisBrowser = browser
-
-            if useDefaltBrowser:
-                webbrowser.open(url)
-
-            else:
-                if translator:
-                    os.system(f"{useThisBrowser[0]} \"{url}\"")
-
-                else:
-                    os.system(f"{useThisBrowser[0]} {url}")
-    else:
+    # if general, execute default action
+    if mode == 'general':
         command = browser_get_open()
         os.system(f'{command} \"{url}\"')
+
+    # if diferent mode, use it
+    else:
+        command = browserPreferences['mode'][mode]['browser']
+        os.system(f'{command} \"{url}\"')
+
 
 def browser_get_open():
     ''' If browser is already open, use it. Else, select browser by predefined order '''
@@ -582,16 +562,20 @@ def browser_get_open():
 def runBrowserStudy(url):
     runBrowser(url, mode='study')
 
+
 def ppress(key):
     pyautogui.press(key)
+
 
 def runScript(scriptName):
     normalizePath()
     os.chdir(os.path.abspath(f'{os.getcwd()}/src/autokey/'))
     os.system(f'python {scriptName}')
 
+
 def runCommand(command):
     os.system(command)
+
 
 def translate(translator='deepl'):
     '''Abre uma página no navegador com a definição do texto selecionado com o cursor'''
@@ -639,6 +623,7 @@ def translate(translator='deepl'):
         if translator == 'linguee':
             searchUrl = base + phrase + '.html'
     runBrowser(searchUrl, translator=True)
+
 
 def browseMap(mapProvider='googleMaps'):
     maps = {
