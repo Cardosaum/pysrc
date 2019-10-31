@@ -644,23 +644,23 @@ def browseSearch(searchProvider='ddg'):
     searchUrl = searchProviders[searchProvider] + search
     runBrowser(searchUrl)
 
-def browseOpenUrl():
-    regex = re.compile(
-        r'^(?:http|ftp)s?://' # http:// or https://
-        r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
-        r'localhost|' #localhost...
-        r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
-        r'(?::\d+)?' # optional port
-        r'(?:/?|[/?]\S+)$', re.IGNORECASE)
-    url = getSelection()
-    if regex.search(url) is not None:
-        webbrowser.open(url)
-    else:
-        url = pyperclip.paste()
-        if regex.search(url) is not None:
-            webbrowser.open(url)
-        else:
-            os.system('zenity --notification  --window-icon=error --text "Select a valid URL"')
+# def browseOpenUrl():
+#     regex = re.compile(
+#         r'^(?:http|ftp)s?://' # http:// or https://
+#         r'(?:(?:[A-Z0-9](?:[A-Z0-9-]{0,61}[A-Z0-9])?\.)+(?:[A-Z]{2,6}\.?|[A-Z0-9-]{2,}\.?)|' #domain...
+#         r'localhost|' #localhost...
+#         r'\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3})' # ...or ip
+#         r'(?::\d+)?' # optional port
+#         r'(?:/?|[/?]\S+)$', re.IGNORECASE)
+#     url = getSelection()
+#     if regex.search(url) is not None:
+#         webbrowser.open(url)
+#     else:
+#         url = pyperclip.paste()
+#         if regex.search(url) is not None:
+#             webbrowser.open(url)
+#         else:
+#             os.system('zenity --notification  --window-icon=error --text "Select a valid URL"')
 
 def takeScreenshot(playSound=False, program='maim', mode='region'):
     os.chdir(getPrintPath())
@@ -924,7 +924,7 @@ def runBrowser_search_ddg():
     browseSearch('ddg')
 
 def runBrowser_openUrl():
-    browseOpenUrl()
+    runBrowser(getSelection())
 
 def screenshot_maim_region():
     takeScreenshot(program='maim', mode='region')
