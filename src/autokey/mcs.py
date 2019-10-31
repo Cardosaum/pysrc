@@ -283,7 +283,7 @@ def gthumbCopyImageWithMouse():
             raise NameError
 
     pyPause = pyautogui.PAUSE
-    # pyautogui.PAUSE = 0.3
+    pyautogui.PAUSE = 0.3
     gthumbWindowInfo = getWindowInfo('gThumb', moreInfo=True)
     gthumb_x = float(gthumbWindowInfo[1][3])
     gthumb_y = float(gthumbWindowInfo[1][4])
