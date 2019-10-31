@@ -516,8 +516,14 @@ def writeText(text):
     pyautogui.typewrite(text)
 
 
-def writeText_screenshot_currentDirectory():
+def writeText_screenshot_directory_current_pending():
     text = str(data_get('printPath', isFileOrFolder=True))
+    time.sleep(0.5)
+    pyautogui.typewrite(text)
+
+def writeText_screenshot_directory_current_created():
+    text = str(data_get('printPath', isFileOrFolder=True))
+    text = text.replace('pendingFlashcards', 'createdFlashcards')
     time.sleep(0.5)
     pyautogui.typewrite(text)
 
