@@ -5,6 +5,22 @@ Intended to work with autokey
 
 import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys
 
+
+
+######################
+## global variables ##
+######################
+
+browserPreferences = collections.defaultdict(dict)
+browserPreferences['browser'] = {'brave-browser': {'command': 'brave-browser','pattern': '- Brave','preference': 9},'firefox': {'command': 'firefox','pattern': '- Mozilla Firefox','preference': 10}}
+browserPreferences['mode']['study'] = {}
+browserPreferences['mode']['study']['browser'] = browserPreferences["browser"]["brave-browser"]["command"]
+
+######################
+######################
+######################
+
+
 def executeScript(scriptName):
     logFunction(scriptName)
     eval(f'{scriptName}()')
@@ -507,36 +523,61 @@ def writeText_screenshot_currentDirectory():
 def getAndWriteText(key):
     writeText(getData(key))
 
-def runBrowser(url, mode='general', translator=False):
-    browserPreferences = collections.defaultdict(dict)
-    browserPreferences['browser'] = {'brave-browser': {'command': 'brave-browser','pattern': '- Brave','preference': 9},'firefox': {'command': 'firefox','pattern': '- Mozilla Firefox','preference': 10}}
-    browserPreferences['mode']['study'] = {}
-    browserPreferences['mode']['study']['browser'] = browserPreferences["browser"]["brave-browser"]["command"]
-    if mode == 'study':
-        os.system(f"{browserPreferences['mode']['study']['browser']} {url}")
+def runBrowser(url, mode='general', translator=False, browser_already_open=False):
+    ''' Selectvly open browser '''
 
-    else:
-        preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
-        useDefaltBrowser = True
-        useThisBrowser = ''
-        for browser in preferedBrowsers:
-            if isWindowActive(browser[1]):
-                useDefaltBrowser = False
-                if useThisBrowser:
-                    if useThisBrowser[2] < browser[2]:
-                        useThisBrowser = browser
-                else:
-                    useThisBrowser = browser
-
-        if useDefaltBrowser:
-            webbrowser.open(url)
+    if browser_already_open:
+        browserPreferences = collections.defaultdict(dict)
+        browserPreferences['browser'] = {'brave-browser': {'command': 'brave-browser','pattern': '- Brave','preference': 9},'firefox': {'command': 'firefox','pattern': '- Mozilla Firefox','preference': 10}}
+        browserPreferences['mode']['study'] = {}
+        browserPreferences['mode']['study']['browser'] = browserPreferences["browser"]["brave-browser"]["command"]
+        if mode == 'study':
+            os.system(f"{browserPreferences['mode']['study']['browser']} {url}")
 
         else:
-            if translator:
-                os.system(f"{useThisBrowser[0]} \"{url}\"")
+            preferedBrowsers = [('firefox', '- Mozilla Firefox', 10), ('brave-browser', '- Brave', 9)]
+            useDefaltBrowser = True
+            useThisBrowser = ''
+            for browser in preferedBrowsers:
+                if isWindowActive(browser[1]):
+                    useDefaltBrowser = False
+                    if useThisBrowser:
+                        if useThisBrowser[2] < browser[2]:
+                            useThisBrowser = browser
+                    else:
+                        useThisBrowser = browser
+
+            if useDefaltBrowser:
+                webbrowser.open(url)
 
             else:
-                os.system(f"{useThisBrowser[0]} {url}")
+                if translator:
+                    os.system(f"{useThisBrowser[0]} \"{url}\"")
+
+                else:
+                    os.system(f"{useThisBrowser[0]} {url}")
+    else:
+        command = browser_get_open()
+        os.system(f'{command} \"{url}\"')
+
+def browser_get_open():
+    ''' If browser is already open, use it. Else, select browser by predefined order '''
+
+    browser_open = False
+    windows = getListOfWindows()
+    for window in windows:
+        for k, v in browserPreferences['browser'].items():
+            if v['pattern'] in window:
+                browser_open = True
+                browser_command = v['command']
+    if not browser_open:
+        browser_command = ''
+        browser_preference = 0
+        for k, v in browserPreferences['browser'].items():
+            if v['preference'] > browser_preference:
+                browser_preference = v['preference']
+                browser_command = v['command']
+    return browser_command
 
 def runBrowserStudy(url):
     runBrowser(url, mode='study')
@@ -616,7 +657,7 @@ def browseSearch(searchProvider='ddg'):
 
     search = getSelection(cleanString=True)
     searchUrl = searchProviders[searchProvider] + search
-    webbrowser.open(searchUrl)
+    runBrowser(searchUrl)
 
 def browseOpenUrl():
     regex = re.compile(
