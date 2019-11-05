@@ -7,7 +7,7 @@ Custom scripts to save time
 * For the required packages, run this command:
 
 ```
-< REQUIREMENTS.txt xargs sudo apt install -y
+< PACKAGES.txt xargs sudo apt install -y
 ```
 
 * For python specific packges, run this:
