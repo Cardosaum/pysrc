@@ -3,7 +3,7 @@ Custom Scripts made by Matheus
 Intended to work with autokey
 '''
 
-import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys
+import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform
 
 
 
@@ -29,10 +29,12 @@ def logFunction(scriptName):
     normalizePath()
     stats = []
     n = datetime.datetime.now()
+    computer_name = platform.uname()[1].strip().replace(" ", "-")
     stats.append(n.strftime('%s')) # get time
     stats.append(scriptName) # name of the script
-    stats.append(getActiveWindow())
-    callsFile = os.path.abspath(os.path.join('..', 'data', 'calls.csv'))
+    stats.append(getActiveWindow()) # name of current window
+    stats.append(computer_name)
+    callsFile = os.path.abspath(os.path.join('..', 'data', f'calls_{computer_name}.csv'))
     with open(callsFile, 'a') as file:
         w = csv.writer(file)
         w.writerow(stats)
