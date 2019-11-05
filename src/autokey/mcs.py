@@ -447,15 +447,21 @@ def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPic
     plataform = subprocess.sys.platform
 
     if plataform == 'linux':
-        flavor, version = subprocess.getoutput('lsb_release -d').split(':')[-1].strip().lower().split()
-        version = float(version)
-        if flavor == 'ubuntu':
-            if version >= 19.00:
+        try:
+            flavor, version = subprocess.getoutput('lsb_release -d').split(':')[-1].strip().lower().split()
+            version = float(version)
+            if flavor == 'ubuntu':
+                if version >= 19.00:
+                    if not countAllCards:
+                        fd = f'fdfind --change-newer-than {nOfWeeks}weeks --type file --search-path {dirPath}'
+                    else:
+                        fd = f'fdfind --type file --search-path {dirPath}'
+            else:
                 if not countAllCards:
-                    fd = f'fdfind --change-newer-than {nOfWeeks}weeks --type file --search-path {dirPath}'
+                    fd = f'fd --change-newer-than {nOfWeeks}weeks --type file --search-path {dirPath}'
                 else:
-                    fd = f'fdfind --type file --search-path {dirPath}'
-        else:
+                    fd = f'fd --type file --search-path {dirPath}'
+        except:
             if not countAllCards:
                 fd = f'fd --change-newer-than {nOfWeeks}weeks --type file --search-path {dirPath}'
             else:
