@@ -12,5 +12,5 @@ Custom scripts to save time
 
 * For python specific packges, run this:
 ```
-< PY_MODULES.txt xargs pip install --user
+< PY_MODULES.txt xargs pip3 install --user
 ```
