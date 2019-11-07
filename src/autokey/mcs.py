@@ -911,7 +911,7 @@ def run_program_joplin():
     runCommand(data_get('path_programs_joplin', isFileOrFolder=True, needTostartWithHome=True))
 
 def run_program_telegram():
-    runCommand(data_get('path_programs_telegram', isFileOrFolder=True, needTostartWithHome=True))
+    runCommand('Telegram')
 
 def runBrowser_translate_linguee():
     translate('linguee')
