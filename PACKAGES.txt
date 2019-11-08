@@ -4,5 +4,6 @@ yad
 scrot
 wmctrl
 gthumb
+feh
 firefox
 flameshot
