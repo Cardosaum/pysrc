@@ -1,6 +1,6 @@
 {
     "type": "script",
-    "description": "run_program_sublime",
+    "description": "run_program_default_text_editor",
     "store": {},
     "modes": [
         3

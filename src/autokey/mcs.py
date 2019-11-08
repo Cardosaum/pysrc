@@ -726,6 +726,9 @@ def browser_download_image():
     except:
         os.system(f'notify-send -i error -t 3000 "error while downloading image"')
 
+def system_application_get_default(mimeType):
+    app = subprocess.getoutput(f'xdg-mime query default {mimeType}').replace('.desktop', '')
+    return app
 
 
 ############
@@ -901,8 +904,8 @@ def run_program_fsearch():
 def run_program_xkill():
     runCommand("xkill")
 
-def run_program_sublime():
-    runCommand("subl")
+def run_program_default_text_editor():
+    runCommand(system_application_get_default('text/x-python'))
 
 def run_program_pdfsam():
     runCommand("pdfsam")
