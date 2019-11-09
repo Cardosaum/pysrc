@@ -45,7 +45,7 @@ def normalizePath():
 def getPrintPath():
     normalizePath()
     data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
-    printPath = data['printPath']
+    printPath = os.path.join(getHome(), data['printPath'])
     data.close()
     return printPath
 
