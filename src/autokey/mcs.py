@@ -43,10 +43,7 @@ def normalizePath():
     os.chdir(os.path.realpath(os.path.abspath(os.path.join(getHome(), 'src'))))
 
 def getPrintPath():
-    normalizePath()
-    data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
-    printPath = os.path.join(getHome(), data['printPath'])
-    data.close()
+    printPath = data_get('printPath', isFileOrFolder=True, needTostartWithHome=True)
     return printPath
 
 def getData(key, returnString=True):
@@ -733,6 +730,10 @@ def browser_download_image():
 
 def system_application_get_default(mimeType):
     app = subprocess.getoutput(f'xdg-mime query default {mimeType}').replace('.desktop', '')
+    if app == 'sublime_text':
+        command = 'subl'
+    else:
+        command = app
     return app
 
 
