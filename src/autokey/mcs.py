@@ -3,7 +3,7 @@ Custom Scripts made by Matheus
 Intended to work with autokey
 '''
 
-import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform
+import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil
 
 
 
@@ -71,7 +71,7 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
                                 raise LookupError
                         else:
                             value = value.split(os.path.sep)
-                            value = f'{getHome()}{os.path.sep.join(value)}'
+                            value = f'{os.path.join(getHome(),os.path.sep.join(value))}'
                         return value
                     else:
                         return value
@@ -316,7 +316,7 @@ def gthumbCopyImageWithKeyboard(manipulateCopy=False, restoreClipboard=True, onl
     if restoreClipboard:
         pyperclip.copy(oldClipboard)
     if onlyBasename:
-        copiedImage = os.paht.basename(copiedImage)
+        copiedImage = os.path.basename(copiedImage)
     return copiedImage
 
 
@@ -736,6 +736,34 @@ def system_application_get_default(mimeType):
         command = app
     return app
 
+def workout_done(nOfDays=1, dirDone='done'):
+
+    confirm = pyautogui.confirm(title='One More Day Done - workout', text='Do you want to confirm this day as done?', buttons=['YES', 'NO'])
+
+    if confirm == 'YES':
+
+        path_workout = data_get('path_workout', isFileOrFolder=True, needTostartWithHome=True)
+        imgs = sorted(os.listdir(path_workout))
+        file1, file2 = [os.path.join(path_workout, imgs[x]) for x in range(2)]
+
+        if os.path.isfile(file1) and os.path.isfile(file2):
+
+            shutil.move(file1, os.path.join(os.path.dirname(file1), dirDone, os.path.basename(file1)))
+
+        else:
+
+            pyautogui.alert(title='No more workout days for this month! - workout', text='You done all exercises days for this month!\n\nI\'ll restart everything!')
+
+            # TODO: move all images from ./done to current folder
+            donePath = os.path.join(data_get('path_workout', isFileOrFolder=True, needTostartWithHome=True), dirDone)
+            filesDone = os.listdir(donePath)
+
+            for fileDone in filesDone:
+                oldPath = os.path.join(donePath, fileDone)
+                newPath = os.path.join(path_workout, fileDone)
+                shutil.move(oldPath, newPath)
+
+
 
 ############
 ## rclone ##
@@ -903,6 +931,9 @@ def run_program_gthumb_currentDirectory():
 
 def run_program_feh_currentDirectory():
     runCommand(f'feh --reverse --sort mtime {getPrintPath()}')
+
+def run_program_feh_workout():
+    runCommand(f'feh -F {data_get("path_workout", isFileOrFolder=True, needTostartWithHome=True)}')
 
 def run_program_fsearch():
     runCommand("fsearch")
