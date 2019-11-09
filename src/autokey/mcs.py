@@ -44,7 +44,13 @@ def normalizePath():
 
 def getPrintPath():
     printPath = data_get('printPath', isFileOrFolder=True, needTostartWithHome=True)
+    # printPath = list(filter(None, printPath))
+    # homePath = getHome().split(os.path.sep)
+    # homePath = list(filter(None, homePath))
+    # finalPath = homePath + printPath
+    # finalPath = os.path.sep + os.path.sep.join(finalPath)
     return printPath
+
 
 def getData(key, returnString=True):
     data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
@@ -70,8 +76,10 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
                             else:
                                 raise LookupError
                         else:
-                            value = value.split(os.path.sep)
-                            value = f'{os.path.join(getHome(),os.path.sep.join(value))}'
+                            value1 = list(filter(None, getHome().split(os.path.sep)))
+                            value2 = list(filter(None, value.split(os.path.sep)))
+                            value = value1 + value2
+                            value = os.path.sep + os.path.sep.join(value)
                         return value
                     else:
                         return value
@@ -522,12 +530,12 @@ def writeText(text):
 
 
 def writeText_screenshot_directory_current_pending():
-    text = str(data_get('printPath', isFileOrFolder=True))
+    text = str(data_get('printPath', isFileOrFolder=True, needTostartWithHome=True))
     time.sleep(0.5)
     pyautogui.typewrite(text)
 
 def writeText_screenshot_directory_current_created():
-    text = str(data_get('printPath', isFileOrFolder=True))
+    text = str(data_get('printPath', isFileOrFolder=True, needTostartWithHome=True))
     text = text.replace('pendingFlashcards', 'createdFlashcards')
     time.sleep(0.5)
     pyautogui.typewrite(text)
@@ -734,7 +742,7 @@ def system_application_get_default(mimeType):
         command = 'subl'
     else:
         command = app
-    return app
+    return command
 
 def workout_done(nOfDays=1, dirDone='done'):
 
