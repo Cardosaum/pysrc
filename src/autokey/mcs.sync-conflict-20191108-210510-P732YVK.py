@@ -45,7 +45,7 @@ def normalizePath():
 def getPrintPath():
     normalizePath()
     data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
-    printPath = os.path.join(getHome(), data['printPath'])
+    printPath = data['printPath']
     data.close()
     return printPath
 
@@ -702,14 +702,9 @@ def takeScreenshot(playSound=False, program='maim', mode='region'):
 def setPrintPath():
     os.chdir(data_get('path_root_pendingFlashcards', isFileOrFolder=True, needTostartWithHome=True))
     windowGeometry = '--maximized'
-    path = os.popen(f'yad --file --directory {windowGeometry} --title="Choose Folder to Save Prints - Anki"').read().strip()
-    if path:
-        if getHome() in path:
-            path = path.replace(getHome(), '')
-        saveData('printPath', path)
-        return path
-    else:
-        pyautogui.alert(title="Choose Folder to Save Prints - Anki", text="Print path didn't changed")
+    path = os.popen(f'yad --file --directory {windowGeometry} --title="Anki - Choose Folder to Save Prints"').read().strip()
+    saveData('printPath', path)
+    return f'{path+"/"}'
 
 def browser_copyLink():
     if isWindowActive('- Mozilla Firefox'):
