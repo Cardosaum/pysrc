@@ -3,7 +3,7 @@ Custom Scripts made by Matheus
 Intended to work with autokey
 '''
 
-import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform
+import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil
 
 
 
@@ -43,11 +43,14 @@ def normalizePath():
     os.chdir(os.path.realpath(os.path.abspath(os.path.join(getHome(), 'src'))))
 
 def getPrintPath():
-    normalizePath()
-    data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
-    printPath = data['printPath']
-    data.close()
+    printPath = data_get('printPath', isFileOrFolder=True, needTostartWithHome=True)
+    # printPath = list(filter(None, printPath))
+    # homePath = getHome().split(os.path.sep)
+    # homePath = list(filter(None, homePath))
+    # finalPath = homePath + printPath
+    # finalPath = os.path.sep + os.path.sep.join(finalPath)
     return printPath
+
 
 def getData(key, returnString=True):
     data = shelve.open(os.path.abspath(os.path.join('..', 'data', 'config')))
@@ -73,8 +76,10 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
                             else:
                                 raise LookupError
                         else:
-                            value = value.split(os.path.sep)
-                            value = f'{getHome()}{os.path.sep.join(value)}'
+                            value1 = list(filter(None, getHome().split(os.path.sep)))
+                            value2 = list(filter(None, value.split(os.path.sep)))
+                            value = value1 + value2
+                            value = os.path.sep + os.path.sep.join(value)
                         return value
                     else:
                         return value
@@ -319,7 +324,7 @@ def gthumbCopyImageWithKeyboard(manipulateCopy=False, restoreClipboard=True, onl
     if restoreClipboard:
         pyperclip.copy(oldClipboard)
     if onlyBasename:
-        copiedImage = os.paht.basename(copiedImage)
+        copiedImage = os.path.basename(copiedImage)
     return copiedImage
 
 
@@ -525,12 +530,12 @@ def writeText(text):
 
 
 def writeText_screenshot_directory_current_pending():
-    text = str(data_get('printPath', isFileOrFolder=True))
+    text = str(data_get('printPath', isFileOrFolder=True, needTostartWithHome=True))
     time.sleep(0.5)
     pyautogui.typewrite(text)
 
 def writeText_screenshot_directory_current_created():
-    text = str(data_get('printPath', isFileOrFolder=True))
+    text = str(data_get('printPath', isFileOrFolder=True, needTostartWithHome=True))
     text = text.replace('pendingFlashcards', 'createdFlashcards')
     time.sleep(0.5)
     pyautogui.typewrite(text)
@@ -702,9 +707,14 @@ def takeScreenshot(playSound=False, program='maim', mode='region'):
 def setPrintPath():
     os.chdir(data_get('path_root_pendingFlashcards', isFileOrFolder=True, needTostartWithHome=True))
     windowGeometry = '--maximized'
-    path = os.popen(f'yad --file --directory {windowGeometry} --title="Anki - Choose Folder to Save Prints"').read().strip()
-    saveData('printPath', path)
-    return f'{path+"/"}'
+    path = os.popen(f'yad --file --directory {windowGeometry} --title="Choose Folder to Save Prints - Anki"').read().strip()
+    if path:
+        if getHome() in path:
+            path = path.replace(getHome(), '')
+        saveData('printPath', path)
+        return path
+    else:
+        pyautogui.alert(title="Choose Folder to Save Prints - Anki", text="Print path didn't changed")
 
 def browser_copyLink():
     if isWindowActive('- Mozilla Firefox'):
@@ -728,7 +738,39 @@ def browser_download_image():
 
 def system_application_get_default(mimeType):
     app = subprocess.getoutput(f'xdg-mime query default {mimeType}').replace('.desktop', '')
-    return app
+    if app == 'sublime_text':
+        command = 'subl'
+    else:
+        command = app
+    return command
+
+def workout_done(nOfDays=1, dirDone='done'):
+
+    confirm = pyautogui.confirm(title='One More Day Done - workout', text='Do you want to confirm this day as done?', buttons=['YES', 'NO'])
+
+    if confirm == 'YES':
+
+        path_workout = data_get('path_workout', isFileOrFolder=True, needTostartWithHome=True)
+        imgs = sorted(os.listdir(path_workout))
+        file1, file2 = [os.path.join(path_workout, imgs[x]) for x in range(2)]
+
+        if os.path.isfile(file1) and os.path.isfile(file2):
+
+            shutil.move(file1, os.path.join(os.path.dirname(file1), dirDone, os.path.basename(file1)))
+
+        else:
+
+            pyautogui.alert(title='No more workout days for this month! - workout', text='You done all exercises days for this month!\n\nI\'ll restart everything!')
+
+            # TODO: move all images from ./done to current folder
+            donePath = os.path.join(data_get('path_workout', isFileOrFolder=True, needTostartWithHome=True), dirDone)
+            filesDone = os.listdir(donePath)
+
+            for fileDone in filesDone:
+                oldPath = os.path.join(donePath, fileDone)
+                newPath = os.path.join(path_workout, fileDone)
+                shutil.move(oldPath, newPath)
+
 
 
 ############
@@ -897,6 +939,9 @@ def run_program_gthumb_currentDirectory():
 
 def run_program_feh_currentDirectory():
     runCommand(f'feh --reverse --sort mtime {getPrintPath()}')
+
+def run_program_feh_workout():
+    runCommand(f'feh -F {data_get("path_workout", isFileOrFolder=True, needTostartWithHome=True)}')
 
 def run_program_fsearch():
     runCommand("fsearch")

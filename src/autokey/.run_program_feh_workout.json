@@ -1,27 +1,27 @@
 {
     "type": "script",
-    "description": "writeText_screenshot_currentDirectory",
+    "description": "run_program_feh_workout",
     "store": {},
     "modes": [
-        1
+        3
     ],
     "usageCount": 0,
     "prompt": false,
     "omitTrigger": false,
     "showInTrayMenu": false,
     "abbreviation": {
-        "abbreviations": [
-            "%ppath"
-        ],
+        "abbreviations": [],
         "backspace": true,
-        "ignoreCase": true,
-        "immediate": true,
+        "ignoreCase": false,
+        "immediate": false,
         "triggerInside": false,
         "wordChars": "[\\w]"
     },
     "hotkey": {
-        "modifiers": [],
-        "hotKey": null
+        "modifiers": [
+            "<super>"
+        ],
+        "hotKey": "]"
     },
     "filter": {
         "regex": null,
