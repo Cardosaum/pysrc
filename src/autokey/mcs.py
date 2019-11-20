@@ -864,6 +864,12 @@ def runBrowser_sites_spotify():
 def runBrowser_sites_gmail():
     runBrowser('https://mail.google.com/mail/u/0/#inbox')
 
+def runBrowser_sites_protonmail():
+    runBrowser('https://mail.protonmail.com/inbox')
+
+def runBrowser_sites_outlook():
+    runBrowser('https://outlook.office365.com/')
+
 def writeText_bce_login():
     getAndWriteText('cpf')
     ppress('tab')
