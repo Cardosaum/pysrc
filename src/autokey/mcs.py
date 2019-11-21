@@ -813,6 +813,9 @@ def writeText_searchKeys_filetype():
 def writeText_searchKeys_site():
     writeText('site:')
 
+def writeText_searchKeys_site_ask():
+    writeText('site:askubuntu.com,stackoverflow.com,meta.stackexchange.com,pt.stackoverflow.com,meta.stackoverflow.com')
+
 def writeText_searchKeys_site_reddit():
     writeText('site:reddit.com')
 
@@ -927,6 +930,9 @@ def writeText_logradouro():
 
 def writeText_gmail():
     getAndWriteText('gmail')
+
+def writeText_email_mcs_protonmail():
+    getAndWriteText('email_mcs_protonmail')
 
 def writeText_email_mcs_unb_outlook():
     getAndWriteText('email_mcs_unb_outlook')
