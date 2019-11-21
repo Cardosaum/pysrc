@@ -4,7 +4,7 @@ import time
 
 home = os.path.expanduser('~')
 
-os.chdir('{}/.local/ulogme/scripts/'.format(home))
+os.chdir('{}/mcs/mat/me/docs/logs/ulogme/scripts'.format(home))
 
 os.system('/usr/bin/python3 ./export_events.py &')
 
