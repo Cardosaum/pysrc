@@ -449,8 +449,9 @@ def anki_add_print(mode='onlyPaste', usemouse=True, numberOfField=3, simpleMode=
     else:
         pass
 
-def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPics=True, countAllCards=False):
-    time.sleep(600)
+def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPics=True, countAllCards=False, wait=False):
+    if wait:
+        time.sleep(600)
     plataform = subprocess.sys.platform
 
     if plataform == 'linux':
@@ -796,7 +797,7 @@ def anki_add_print_removePrevious():
     anki_add_print('removePrevious', simpleMode=False)
 
 def anki_screenshot_notification_startup():
-    anki_screenshot_notification('/home/matheus/mcs/study/anki/pics/pendingFlashcards/')
+    anki_screenshot_notification('/home/matheus/mcs/study/anki/pics/pendingFlashcards/', wait=True)
 
 def writeText_autokey_without_autohotkey():
     writeText('autokey -autohotkey')
