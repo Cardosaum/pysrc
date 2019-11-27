@@ -621,7 +621,8 @@ def translate(translator='deepl'):
     translatorsOnlyOneWord = ['linguee', 'cambridge']
 
     normalizePath()
-    with open(os.path.abspath(os.path.join('..', 'data', 'translations.csv')), 'a') as file:
+    computer_name = platform.uname()[1].strip().replace(" ", "-")
+    with open(os.path.abspath(os.path.join('..', 'data', f'translations_{computer_name}.csv')), 'a') as file:
         reader = csv.writer(file)
         line = []
         text = getSelection(removeCharacters=(('\n', '\r'), ' '))
@@ -629,6 +630,7 @@ def translate(translator='deepl'):
         line.append(n.strftime('%s')) # get time
         line.append(text)
         line.append(getActiveWindow())
+        line.append(computer_name)
         reader.writerow(line)
 
     base = translators[translator]
