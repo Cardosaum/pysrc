@@ -3,22 +3,10 @@ Custom Scripts made by Matheus
 Intended to work with autokey
 '''
 
-import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil
+import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil, keyring
 
 
 
-######################
-## global variables ##
-######################
-
-browserPreferences = collections.defaultdict(dict)
-browserPreferences['browser'] = {'brave-browser': {'command': 'brave-browser','pattern': '- Brave','preference': 9},'firefox': {'command': 'firefox','pattern': '- Mozilla Firefox','preference': 10}}
-browserPreferences['mode']['study'] = {}
-browserPreferences['mode']['study']['browser'] = browserPreferences["browser"]["brave-browser"]["command"]
-
-######################
-######################
-######################
 
 
 def executeScript(scriptName):
@@ -61,12 +49,17 @@ def getData(key, returnString=True):
     else:
         return dataNeeded
 
-def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=False):
+def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=False, isAut=False):
     normalizePath()
     with shelve.open(os.path.abspath(os.path.join('..', 'data', 'config'))) as f:
 
         if key:
             value = f[key]
+            if isAut:
+                data = value.split(',')
+                data = keyring.get_password(data[0], data[-1])
+                return data
+
             if os.path.sep in value:
                 if isFileOrFolder:
                     if needTostartWithHome:
@@ -542,8 +535,15 @@ def writeText_screenshot_directory_current_created():
     pyautogui.typewrite(text)
 
 
-def getAndWriteText(key):
-    writeText(getData(key))
+def getAndWriteText(key, aut=False, enter=False):
+    if aut:
+        writeText(data_get(key, isAut=aut))
+        if enter:
+            time.sleep(0.3)
+            pyautogui.press('enter')
+
+    else:
+        writeText(getData(key))
 
 
 def runBrowser(url, mode='general', translator=False, browser_already_open=False):
@@ -899,6 +899,15 @@ def writeText_phone():
 def writeText_matricula():
     getAndWriteText('matricula')
 
+def writeText_aut_jupyter():
+    getAndWriteText('aut_jupyter', aut=True)
+
+def writeText_aut_neptune():
+    getAndWriteText('aut_neptune', aut=True)
+
+def writeText_aut_jupyter_now():
+    getAndWriteText('aut_jupyter', aut=True, enter=True)
+
 def writeText_code_enterTODO():
     writeText('# TODO: ')
 
@@ -1015,3 +1024,27 @@ def screenshot_selectPrintDirectory():
 
 # set correct directory path
 normalizePath()
+
+
+######################
+## global variables ##
+######################
+
+browserPreferences = collections.defaultdict(dict)
+browserPreferences['browser'] = {
+    'brave-browser': {
+        'command': 'brave-browser', 'pattern': '- Brave', 'preference': 9
+                    },
+    'firefox': {
+        'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 10
+                },
+    'vivaldi': {
+        'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 8
+                }
+}
+browserPreferences['mode']['study'] = {}
+browserPreferences['mode']['study']['browser'] = browserPreferences["browser"][getData('browser_study')]["command"]
+
+######################
+######################
+######################
