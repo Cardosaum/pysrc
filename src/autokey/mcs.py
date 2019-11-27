@@ -515,7 +515,18 @@ def tg_bot(bot_token, chatID, message):
 
     return response.json()
 
+##########
+##Ulogme##
+##########
 
+def ulogme_run():
+    ulogme_directory = data_get('ulogme_directory', isFileOrFolder=True, needTostartWithHome=True)
+    os.chdir(ulogme_directory)
+    os.system('/usr/bin/python3 ./export_events.py &')
+    time.sleep(3)
+    os.system('/usr/bin/python3 ./ulogme_serve.py &')
+    time.sleep(0.2)
+    runBrowser('http://localhost:8124')
 
 
 def writeText(text):
@@ -924,7 +935,8 @@ def anki_add_imgOcl_run():
     runScript('anki_add_imgOcl.py')
 
 def runBrowser_ulogme_logView():
-    runScript('run_ulogme_logView.py')
+    ulogme_run()
+    # runScript('run_ulogme_logView.py')
 
 def writeText_names_jhenyfer():
     writeText('Jhenyfer')
