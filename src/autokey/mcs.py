@@ -1053,7 +1053,13 @@ browserPreferences['browser'] = {
         'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 10
                 },
     'vivaldi': {
-        'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 8
+        'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 7
+                },
+    'min': {
+        'command': 'min', 'pattern': 'Min', 'preference': 8
+                },
+    'google-chrome': {
+        'command': 'google-chrome', 'pattern': '- Google Chrome', 'preference': 12
                 }
 }
 browserPreferences['mode']['study'] = {}
