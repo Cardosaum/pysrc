@@ -670,7 +670,7 @@ def browseMap(mapProvider='googleMaps'):
 def browseSearch(searchProvider='ddg'):
     searchProviders = {
                         'ddg': 'https://duckduckgo.com/?q=',
-                        'google': ''
+                        'google': 'https://www.google.com/search?q='
     }
 
     search = getSelection(cleanString=True)
@@ -828,7 +828,9 @@ def writeText_searchKeys_site():
     writeText('site:')
 
 def writeText_searchKeys_site_ask():
-    writeText('site:askubuntu.com,stackoverflow.com,meta.stackexchange.com,pt.stackoverflow.com,meta.stackoverflow.com')
+    listOfSites = 'askubuntu.com,stackoverflow.com,meta.stackexchange.com,pt.stackoverflow.com,meta.stackoverflow.com'.split(',')
+    search = 'site:' + ' OR site:'.join(listOfSites)
+    writeText(search)
 
 def writeText_searchKeys_site_reddit():
     writeText('site:reddit.com')
@@ -1019,7 +1021,7 @@ def runBrowser_maps_openStreet():
     browseMap('openStreet')
 
 def runBrowser_search_ddg():
-    browseSearch('ddg')
+    browseSearch('google')
 
 def runBrowser_openUrl():
     runBrowser(getSelection())
