@@ -750,6 +750,15 @@ def browser_download_image():
     except:
         os.system(f'notify-send -i error -t 3000 "error while downloading image"')
 
+def browser_select_by_preference():
+    x = 0
+    for browser, info in browserPreferences['browser'].items():
+        if info['preference'] > x:
+            x = info['preference']
+            command = info['command']
+    return command
+
+
 def system_application_get_default(mimeType):
     app = subprocess.getoutput(f'xdg-mime query default {mimeType}').replace('.desktop', '')
     if app == 'sublime_text':
@@ -970,7 +979,7 @@ def run_program_anki():
     runCommand("anki -p 'study'")
 
 def run_program_browser():
-    runCommand("firefox")
+    runCommand(browser_select_by_preference())
 
 def run_program_gthumb_currentDirectory():
     runCommand(f"gthumb -f {getPrintPath()}")
