@@ -1061,7 +1061,7 @@ browserPreferences['browser'] = {
         'command': 'brave-browser', 'pattern': '- Brave', 'preference': 9
                     },
     'firefox': {
-        'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 10
+        'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 11
                 },
     'vivaldi': {
         'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 7
@@ -1070,7 +1070,7 @@ browserPreferences['browser'] = {
         'command': 'min', 'pattern': 'Min', 'preference': 8
                 },
     'google-chrome': {
-        'command': 'google-chrome', 'pattern': '- Google Chrome', 'preference': 12
+        'command': 'google-chrome', 'pattern': '- Google Chrome', 'preference': 10
                 }
 }
 browserPreferences['mode']['study'] = {}
