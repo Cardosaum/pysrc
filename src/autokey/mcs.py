@@ -1030,7 +1030,7 @@ def runBrowser_maps_openStreet():
     browseMap('openStreet')
 
 def runBrowser_search_ddg():
-    browseSearch('google')
+    browseSearch('ddg')
 
 def runBrowser_openUrl():
     runBrowser(getSelection())
@@ -1058,19 +1058,22 @@ normalizePath()
 browserPreferences = collections.defaultdict(dict)
 browserPreferences['browser'] = {
     'brave-browser': {
-        'command': 'brave-browser', 'pattern': '- Brave', 'preference': 9
+        'command': 'brave-browser', 'pattern': '- Brave', 'preference': 5
                     },
     'firefox': {
-        'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 11
+        'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 6
                 },
     'vivaldi': {
-        'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 7
+        'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 1
                 },
     'min': {
-        'command': 'min', 'pattern': 'Min', 'preference': 8
+        'command': 'min', 'pattern': 'Min', 'preference': 3
+                },
+    'chromium': {
+        'command': 'chromium', 'pattern': '- Chromium', 'preference': 4
                 },
     'google-chrome': {
-        'command': 'google-chrome', 'pattern': '- Google Chrome', 'preference': 10
+        'command': 'google-chrome', 'pattern': '- Google Chrome', 'preference': 2
                 }
 }
 browserPreferences['mode']['study'] = {}
