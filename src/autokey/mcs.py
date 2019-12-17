@@ -578,9 +578,14 @@ def browser_get_open():
     windows = getListOfWindows()
     for window in windows:
         for k, v in browserPreferences['browser'].items():
-            if v['pattern'] in window:
+
+            pattern_regex = re.compile(v['pattern'])
+            pattern_match = pattern_regex.search(window)
+
+            if pattern_match:
                 browser_open = True
                 browser_command = v['command']
+
     if not browser_open:
         browser_command = ''
         browser_preference = 0
@@ -1101,7 +1106,7 @@ browserPreferences['browser'] = {
         'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 1
                 },
     'min': {
-        'command': 'min', 'pattern': 'Min', 'preference': 3
+        'command': 'min', 'pattern': '^Min$', 'preference': 3
                 },
     'chromium': {
         'command': 'chromium', 'pattern': '- Chromium', 'preference': 4
