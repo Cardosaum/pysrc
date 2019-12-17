@@ -49,7 +49,7 @@ def getData(key, returnString=True):
     else:
         return dataNeeded
 
-def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=False, isAut=False):
+def data_get(key='', list_keys=True, isFileOrFolder=False, needTostartWithHome=False, isAut=False):
     normalizePath()
     with shelve.open(os.path.abspath(os.path.join('..', 'data', 'config'))) as f:
 
@@ -79,7 +79,7 @@ def data_get(key='', list_keys=False, isFileOrFolder=False, needTostartWithHome=
             return value, os.path.sep
 
         if list_keys:
-            return list(f.items())
+            return sorted(list(f.items()))
 
 def saveData(key, value):
     normalizePath()
