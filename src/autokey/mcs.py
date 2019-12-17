@@ -795,6 +795,40 @@ def workout_done(nOfDays=1, dirDone='done'):
                 shutil.move(oldPath, newPath)
 
 
+#############
+## startup ##
+#############
+
+def startup():
+    # Set Wallpaper:
+
+    # OBS: wallpaper_command will have a string similar to this:
+    # ' dbus-send --session --dest=org.kde.plasmashell --type=method_call /PlasmaShell org.kde.PlasmaShell.evaluateScript \'string:var Desktops = desktops();for (i=0;i<Desktops.length;i++) {d = Desktops[i];d.wallpaperPlugin = "org.kde.image";d.currentConfigGroup = Array("Wallpaper","org.kde.image","General");d.writeConfig("Image", "file:///PATH/TO/IMAGE.png");}\' '
+    # only replace `file:///PATH/TO/IMAGE.png` with the pretended wallpaper
+    # got this command in this link: https://www.reddit.com/r/kde/comments/65pmhj/change_wallpaper_from_terminal/dgc5qzy?utm_source=share&utm_medium=web2x
+
+    wallpaper_command = data_get('wallpaper_path')[0]
+    subprocess.run(wallpaper_command, shell=True)
+
+    # Start Programs:
+
+    synapse_command = 'synapse --startup'
+    flameshot_command = 'flameshot'
+    redshift_command = 'redshift-gtk'
+
+    # Start custom scripts:
+
+    ulogme_command = data_get('startup-ulogme', isFileOrFolder=True, needTostartWithHome=True)
+    autokey_command = data_get('startup-autokey', isFileOrFolder=True, needTostartWithHome=True)
+    anki_screenshot_notification_command = data_get('startup-anki_screenshot_notification', isFileOrFolder=True, needTostartWithHome=True)
+
+    commands = [synapse_command, flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command]
+
+    for com in commands:
+        subprocess.run(f'{com} &', shell=True)
+
+
+
 
 ############
 ## rclone ##
@@ -1030,7 +1064,7 @@ def runBrowser_maps_openStreet():
     browseMap('openStreet')
 
 def runBrowser_search_ddg():
-    browseSearch('google')
+    browseSearch('ddg')
 
 def runBrowser_openUrl():
     runBrowser(getSelection())
@@ -1058,19 +1092,22 @@ normalizePath()
 browserPreferences = collections.defaultdict(dict)
 browserPreferences['browser'] = {
     'brave-browser': {
-        'command': 'brave-browser', 'pattern': '- Brave', 'preference': 9
+        'command': 'brave-browser', 'pattern': '- Brave', 'preference': 5
                     },
     'firefox': {
-        'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 11
+        'command': 'firefox', 'pattern': '- Mozilla Firefox', 'preference': 6
                 },
     'vivaldi': {
-        'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 7
+        'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 1
                 },
     'min': {
-        'command': 'min', 'pattern': 'Min', 'preference': 8
+        'command': 'min', 'pattern': 'Min', 'preference': 3
+                },
+    'chromium': {
+        'command': 'chromium', 'pattern': '- Chromium', 'preference': 4
                 },
     'google-chrome': {
-        'command': 'google-chrome', 'pattern': '- Google Chrome', 'preference': 10
+        'command': 'google-chrome', 'pattern': '- Google Chrome', 'preference': 2
                 }
 }
 browserPreferences['mode']['study'] = {}
