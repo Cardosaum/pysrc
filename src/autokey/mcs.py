@@ -817,7 +817,7 @@ def startup():
 
     # Start Programs:
 
-    synapse_command = 'synapse --startup'
+    # synapse_command = 'synapse --startup'
     flameshot_command = 'flameshot'
     redshift_command = 'redshift-gtk'
 
@@ -826,13 +826,10 @@ def startup():
     ulogme_command = data_get('startup-ulogme', isFileOrFolder=True, needTostartWithHome=True)
     autokey_command = data_get('startup-autokey', isFileOrFolder=True, needTostartWithHome=True)
     anki_screenshot_notification_command = data_get('startup-anki_screenshot_notification', isFileOrFolder=True, needTostartWithHome=True)
+    aw_activitywatch_command = data_get('startup-aw_activitywatch', isFileOrFolder=True, needTostartWithHome=True)
 
-    # Removed ActivityWatch - It's consuming a lot of computer resources
+    commands = [flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command, aw_activitywatch_command]
 
-    # aw_activitywatch_command = data_get('startup-aw_activitywatch', isFileOrFolder=True, needTostartWithHome=True)
-    # commands = [synapse_command, flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command, aw_activitywatch_command]
-
-    commands = [synapse_command, flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command]
 
     for com in commands:
         subprocess.run(f'{com} &', shell=True)
