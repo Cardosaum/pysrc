@@ -1112,6 +1112,9 @@ def text_editor_open_i3configmcs():
 def text_editor_open_sxhkd_mcs():
     text_editor_open_file(data_get('file__sxhkd_mcs.txt', isFileOrFolder=True, needTostartWithHome=True))
 
+def text_editor_open_zpreztorc():
+    text_editor_open_file(data_get('file__zpreztorc', isFileOrFolder=True, needTostartWithHome=True))
+
 
 
 # set correct directory path
