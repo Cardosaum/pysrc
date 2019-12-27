@@ -60,22 +60,21 @@ def data_get(key='', list_keys=True, isFileOrFolder=False, needTostartWithHome=F
                 data = keyring.get_password(data[0], data[-1])
                 return data
 
-            if os.path.sep in value:
-                if isFileOrFolder:
-                    if needTostartWithHome:
-                        if value.startswith(getHome()):
-                            if os.path.exists(value):
-                                pass
-                            else:
-                                raise LookupError
+            if isFileOrFolder:
+                if needTostartWithHome:
+                    if value.startswith(getHome()):
+                        if os.path.exists(value):
+                            pass
                         else:
-                            value1 = list(filter(None, getHome().split(os.path.sep)))
-                            value2 = list(filter(None, value.split(os.path.sep)))
-                            value = value1 + value2
-                            value = os.path.sep + os.path.sep.join(value)
-                        return value
+                            raise LookupError
                     else:
-                        return value
+                        value1 = list(filter(None, getHome().split(os.path.sep)))
+                        value2 = list(filter(None, value.split(os.path.sep)))
+                        value = value1 + value2
+                        value = os.path.sep + os.path.sep.join(value)
+                    return value
+                else:
+                    return value
             return value, os.path.sep
 
         if list_keys:
@@ -768,6 +767,8 @@ def system_application_get_default(mimeType):
     app = subprocess.getoutput(f'xdg-mime query default {mimeType}').replace('.desktop', '')
     if app == 'sublime_text':
         command = 'subl'
+    if app == 'sublime_text_3':
+        command = 'subl3'
     else:
         command = app
     return command
@@ -799,36 +800,41 @@ def workout_done(nOfDays=1, dirDone='done'):
                 newPath = os.path.join(path_workout, fileDone)
                 shutil.move(oldPath, newPath)
 
+def text_editor_open_file(file):
+    default_text_editor = system_application_get_default('text/x-python')
+    os.system(f"{default_text_editor} {file}")
 
 #############
 ## startup ##
 #############
 
 def startup():
-    # Set Wallpaper:
+    # ## DEPRECATED - work in Plasma KDE (but currently I'm using i3wm)
+    # # Set Wallpaper:
 
-    # OBS: wallpaper_command will have a string similar to this:
-    # ' dbus-send --session --dest=org.kde.plasmashell --type=method_call /PlasmaShell org.kde.PlasmaShell.evaluateScript \'string:var Desktops = desktops();for (i=0;i<Desktops.length;i++) {d = Desktops[i];d.wallpaperPlugin = "org.kde.image";d.currentConfigGroup = Array("Wallpaper","org.kde.image","General");d.writeConfig("Image", "file:///PATH/TO/IMAGE.png");}\' '
-    # only replace `file:///PATH/TO/IMAGE.png` with the pretended wallpaper
-    # got this command in this link: https://www.reddit.com/r/kde/comments/65pmhj/change_wallpaper_from_terminal/dgc5qzy?utm_source=share&utm_medium=web2x
+    # # OBS: wallpaper_command will have a string similar to this:
+    # # ' dbus-send --session --dest=org.kde.plasmashell --type=method_call /PlasmaShell org.kde.PlasmaShell.evaluateScript \'string:var Desktops = desktops();for (i=0;i<Desktops.length;i++) {d = Desktops[i];d.wallpaperPlugin = "org.kde.image";d.currentConfigGroup = Array("Wallpaper","org.kde.image","General");d.writeConfig("Image", "file:///PATH/TO/IMAGE.png");}\' '
+    # # only replace `file:///PATH/TO/IMAGE.png` with the pretended wallpaper
+    # # got this command in this link: https://www.reddit.com/r/kde/comments/65pmhj/change_wallpaper_from_terminal/dgc5qzy?utm_source=share&utm_medium=web2x
 
-    wallpaper_command = data_get('wallpaper_path')[0]
-    subprocess.run(wallpaper_command, shell=True)
+    # wallpaper_command = data_get('wallpaper_path')[0]
+    # subprocess.run(wallpaper_command, shell=True)
 
     # Start Programs:
 
     # synapse_command = 'synapse --startup'
     flameshot_command = 'flameshot'
-    redshift_command = 'redshift-gtk'
+    redshift_command = 'redshift -O 4100 -g 0.8'
 
     # Start custom scripts:
 
     ulogme_command = data_get('startup-ulogme', isFileOrFolder=True, needTostartWithHome=True)
-    autokey_command = data_get('startup-autokey', isFileOrFolder=True, needTostartWithHome=True)
+    # autokey_command = data_get('startup-autokey', isFileOrFolder=True, needTostartWithHome=True)
     anki_screenshot_notification_command = data_get('startup-anki_screenshot_notification', isFileOrFolder=True, needTostartWithHome=True)
-    aw_activitywatch_command = data_get('startup-aw_activitywatch', isFileOrFolder=True, needTostartWithHome=True)
+    # aw_activitywatch_command = data_get('startup-aw_activitywatch', isFileOrFolder=True, needTostartWithHome=True)
 
-    commands = [flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command, aw_activitywatch_command]
+    # commands = [flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command, aw_activitywatch_command]
+    commands = [flameshot_command, redshift_command, ulogme_command, anki_screenshot_notification_command]
 
 
     for com in commands:
@@ -861,6 +867,9 @@ def anki_add_print_removePrevious():
 
 def anki_screenshot_notification_startup():
     anki_screenshot_notification('/home/matheus/mcs/study/anki/pics/pendingFlashcards/', wait=True)
+
+def anki_screenshot_notification_oneshot():
+    anki_screenshot_notification('/home/matheus/mcs/study/anki/pics/pendingFlashcards/')
 
 def writeText_autokey_without_autohotkey():
     writeText('autokey -autohotkey')
@@ -1040,6 +1049,9 @@ def run_program_xkill():
 def run_program_default_text_editor():
     runCommand(system_application_get_default('text/x-python'))
 
+def run_program_default_text_editor():
+    runCommand(system_application_get_default('text/x-python'))
+
 def run_program_pdfsam():
     runCommand("pdfsam")
 
@@ -1047,7 +1059,10 @@ def run_program_joplin():
     runCommand(data_get('path_programs_joplin', isFileOrFolder=True, needTostartWithHome=True))
 
 def run_program_telegram():
-    runCommand('Telegram')
+    runCommand('telegram-desktop')
+
+def run_program_gnome_todo():
+    runCommand('gnome-todo')
 
 def runBrowser_translate_linguee():
     translate('linguee')
@@ -1088,6 +1103,16 @@ def screenshot_scrot_activeWindow():
 def screenshot_selectPrintDirectory():
     setPrintPath()
 
+def text_editor_open_mcs():
+    text_editor_open_file(data_get('file__mcs.py', isFileOrFolder=True, needTostartWithHome=True))
+
+def text_editor_open_i3configmcs():
+    text_editor_open_file(data_get('file__i3configmcs.txt', isFileOrFolder=True, needTostartWithHome=True))
+
+def text_editor_open_sxhkd_mcs():
+    text_editor_open_file(data_get('file__sxhkd_mcs.txt', isFileOrFolder=True, needTostartWithHome=True))
+
+
 # set correct directory path
 normalizePath()
 
@@ -1106,6 +1131,9 @@ browserPreferences['browser'] = {
                 },
     'vivaldi': {
         'command': 'vivaldi', 'pattern': '- Vivaldi', 'preference': 1
+                },
+    'vivaldi-stable': {
+        'command': 'vivaldi-stable', 'pattern': '- Vivaldi', 'preference': 1
                 },
     'min': {
         'command': 'min', 'pattern': '^Min$', 'preference': 3

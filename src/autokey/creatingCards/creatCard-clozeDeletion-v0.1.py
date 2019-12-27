@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 #
 #
 # Writen by Matheus Cardoso, 2019/07/16
