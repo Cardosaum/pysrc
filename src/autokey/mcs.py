@@ -1117,6 +1117,7 @@ def text_editor_open_sxhkd_mcs():
 # set correct directory path
 normalizePath()
 
+
 ######################
 ## global variables ##
 ######################
