@@ -1118,6 +1118,7 @@ def text_editor_open_sxhkd_mcs():
 normalizePath()
 
 
+
 ######################
 ## global variables ##
 ######################
