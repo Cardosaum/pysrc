@@ -3,7 +3,7 @@ Custom Scripts made by Matheus
 Intended to work with autokey
 '''
 
-import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil, keyring
+import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil, keyring, json
 
 
 
@@ -841,6 +841,133 @@ def startup():
         subprocess.run(f'{com} &', shell=True)
 
 
+############
+### i3wm ###
+############
+
+
+def i3_get_workspaces_names():
+    '''
+    This function read the content of i3wm configuration file
+    and return a list with workspaces' names
+    Ex:
+    ['1: web',
+     '2: term',
+     '3: code',
+     '4: apps',
+     '5',
+     '6',
+     '7',
+     '8',
+     '9',
+     '10: chats']
+    '''
+    config_file_path = data_get('file__i3configmcs.txt', isFileOrFolder=True, needTostartWithHome=True)
+    with open(config_file_path) as config_file:
+        data = config_file.readlines()
+        # This regex only works for my configured pattern:
+        #  set $ws<number> "<anything>"
+        re_workspacenames = re.compile(r"((set)\s*(\$ws\d+)\s*(\".*\"))")
+        workspace_names = []
+        for line in data:
+            workspace_name = re_workspacenames.search(line)
+            if workspace_name:
+                workspace_names.append(workspace_name.group(4).strip('"'))
+    return workspace_names
+
+def i3_get_workspaces_current():
+    '''
+    This function return the currently state of the activated workspaces
+    in this form, for example:
+        {'num': 1, 'name': '1: web', 'visible': False, 'focused': False, 'rect': {'x': 0, 'y': 0, 'width': 1366, 'height': 747}, 'output': 'eDP-1', 'urgent': False}
+        {'num': 2, 'name': '2: term', 'visible': False, 'focused': False, 'rect': {'x': 0, 'y': 0, 'width': 1366, 'height': 747}, 'output': 'eDP-1', 'urgent': False}
+        {'num': 3, 'name': '3: code', 'visible': True, 'focused': True, 'rect': {'x': 0, 'y': 0, 'width': 1366, 'height': 747}, 'output': 'eDP-1', 'urgent': False}
+        {'num': 4, 'name': '4: apps', 'visible': False, 'focused': False, 'rect': {'x': 0, 'y': 0, 'width': 1366, 'height': 747}, 'output': 'eDP-1', 'urgent': False}
+    '''
+    # This function I copied from 
+    # http://bhepple.com/doku/doku.php?id=unixscripts
+    # file: i3-ws.py
+    handle = subprocess.Popen(["i3-msg","-t","get_workspaces"], stdout=subprocess.PIPE)
+    output = handle.communicate()[0]
+    data = json.loads(output.decode())
+    data = sorted(data, key=lambda k: k['name'])
+    return data
+
+def i3_get_workspace_current():
+    '''
+    Return the current active workspace
+    in the form, for example:
+        {'num': 3, 'name': '3: code', 'visible': True, 'focused': True, 'rect': {'x': 0, 'y': 0, 'width': 1366, 'height': 747}, 'output': 'eDP-1', 'urgent': False}
+    '''
+    data = i3_get_workspaces_current()
+    for workspace in data:
+        if workspace['visible'] == True:
+            workspace_current = workspace
+            break
+    return workspace_current
+
+def i3_get_workspace_pretended(which='next'):
+    ''' 
+    Select the 'next', ('previous' or 'prev') or '(<current_workspace> + <int>)', where <int> is positive (hence, selecting workspace 2 positions ahead the current) or negative (selecting workspace 2 positions before the current)
+    Ex:
+    i3_select_workspace(which='next')
+    move from $ws1 → $ws2 
+
+    i3_select_workspace(which='prev')
+    move from $ws1 → $ws10  (assuming we have only 10 workspaces)
+
+    i3_select_workspace(which=5)
+    move from $ws1 → $ws6
+
+    i3_select_workspace(which=-4)
+    move from $ws1 → $ws7   (assuming we have only 10 workspaces)
+    '''
+    workspaces = i3_get_workspaces_names()
+    workspace_current = i3_get_workspace_current()
+    use_next_workspace = False
+    num = workspace_current['num']
+    tot = len(workspaces)
+    if which == 'next':
+        modify = 1
+    elif which == 'prev' or which == 'previous':
+        modify = -1
+    else:
+        # if `which` isn't 'next' neither 'previous', we'll assume this is an integer (either positive or negative)
+        modify = int(which)
+
+    if modify > 0:
+        if ((modify + num) // tot) < 1:
+            ws = modify + num
+        elif ((modify + num) // tot) == 1 and ((modify + num) % tot) == 0:
+            ws = modify + num
+        else: 
+            ws = (modify + num) % tot
+    if modify < 0:
+        if (num + modify) <= 0:
+            ws = tot + (num + modify)
+        else:
+            ws = (num + modify)
+    for workspace in workspaces:
+        n = int(re.search(r'\d+', workspace).group())
+        if n == ws:
+            workspace_pretended = workspace
+
+    return workspace_pretended
+
+def i3_workspace(mode='focus', x='next'):
+    ws = i3_get_workspace_pretended(which=x)
+    base = 'i3-msg'
+    common = 'workspace'
+    if mode == 'focus':
+        command = f"{base} {common} {ws}"
+    if mode == 'move':
+        command = f"{base} {mode} {common} {ws}"
+    subprocess.run(command, shell=True)
+
+
+
+
+
 
 
 ############
@@ -1115,6 +1242,11 @@ def text_editor_open_sxhkd_mcs():
 def text_editor_open_zpreztorc():
     text_editor_open_file(data_get('file__zpreztorc', isFileOrFolder=True, needTostartWithHome=True))
 
+def i3_workspace_focus_next():
+    i3_workspace(mode='focus', x='next')
+
+def i3_workspace_focus_previous():
+    i3_workspace(mode='focus', x='prev')
 
 
 # set correct directory path
