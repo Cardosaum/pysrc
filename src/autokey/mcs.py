@@ -214,7 +214,7 @@ def windowExist(pattern):
 
 def activateWindow(windowPattern):
     window = getWindowInfo(windowPattern, moreInfo=True)
-    os.system(f'wmctrl -ia {window[1][1]}')
+    subprocess.run(f'wmctrl -ia {window[1][1]}', shell=True)
 
 ### deprecated ###
 def gthumbCopyAndPaste(typeOfCopy='removePrevious', usemouse=True, numberOfField=1):
@@ -521,9 +521,9 @@ def tg_bot(bot_token, chatID, message):
 def ulogme_run():
     ulogme_directory = data_get('ulogme_directory', isFileOrFolder=True, needTostartWithHome=True)
     os.chdir(ulogme_directory)
-    os.system('/usr/bin/python3 ./export_events.py &')
+    subprocess.run('/usr/bin/python3 ./export_events.py &', shell=True)
     time.sleep(3)
-    os.system('/usr/bin/python3 ./ulogme_serve.py &')
+    subprocess.run('/usr/bin/python3 ./ulogme_serve.py &', shell=True)
     time.sleep(0.2)
     runBrowser('http://localhost:8124')
 
@@ -562,12 +562,12 @@ def runBrowser(url, mode='general', translator=False, browser_already_open=False
     # if general, execute default action
     if mode == 'general':
         command = browser_get_open()
-        os.system(f'{command} \"{url}\"')
+        subprocess.run(f'{command} \"{url}\" &', shell=True)
 
     # if diferent mode, use it
     else:
         command = browserPreferences['mode'][mode]['browser']
-        os.system(f'{command} \"{url}\"')
+        subprocess.run(f'{command} \"{url}\" &', shell=True)
 
 
 def browser_get_open():
@@ -605,11 +605,11 @@ def ppress(key):
 def runScript(scriptName):
     normalizePath()
     os.chdir(os.path.abspath(f'{os.getcwd()}/src/autokey/'))
-    os.system(f'python {scriptName}')
+    subprocess.run(f'python {scriptName} &', shell=True)
 
 
 def runCommand(command):
-    os.system(command)
+    subprocess.run(f"{command} &", shell=True)
 
 
 def translate(translator='deepl'):
@@ -655,7 +655,7 @@ def translate(translator='deepl'):
             searchUrl = base + phrase
     if translator in translatorsOnlyOneWord:
         if not singleWord:
-            os.system('zenity --notification  --window-icon=error --text "Select just one word"')
+            subprocess.run('zenity --notification  --window-icon=error --text "Select just one word" &', shell=True)
             sys.exit(1)
         if translator == 'linguee':
             searchUrl = base + phrase + '.html'
@@ -697,7 +697,7 @@ def browseSearch(searchProvider='ddg'):
 #         if regex.search(url) is not None:
 #             webbrowser.open(url)
 #         else:
-#             os.system('zenity --notification  --window-icon=error --text "Select a valid URL"')
+#             subprocess.run('zenity --notification  --window-icon=error --text "Select a valid URL"', shell=True)
 
 def takeScreenshot(playSound=False, program='maim', mode='region'):
     os.chdir(getPrintPath())
@@ -706,21 +706,21 @@ def takeScreenshot(playSound=False, program='maim', mode='region'):
             command = "maim -s --hidecursor $(date +%Y-%m-%d_%H-%M-%S_%s)_maim.png"
         elif mode == 'active':
             pass
-        os.system(f"sleep 0.2 ; {command}")
+        subprocess.run(f"sleep 0.2 ; {command} &", shell=True)
     if program == 'flameshot':
         if mode == 'region':
             command = f'flameshot gui -p {getPrintPath()}'
         elif mode == 'active':
             pass
-        os.system(command)
+        subprocess.run(f"{command} &", shell=True)
     if program == 'scrot':
         if mode == 'activeWinow':
             command = f"scrot -u '%Y-%m-%d_%H-%M-%S_%s_scrot.png'"
-            os.system(f"sleep 0.2 ; {command}")
+            subprocess.run(f"sleep 0.2 ; {command} &", shell=True)
     if playSound:
         soundPath = data_get('cameraSound', isFileOrFolder=True, needTostartWithHome=True)
         soundCommand = 'audacious -qH'
-        os.system(f'{soundCommand} {soundPath}')
+        subprocess.run(f'{soundCommand} {soundPath}  &', shell=True)
 
 def setPrintPath():
     os.chdir(data_get('path_root_pendingFlashcards', isFileOrFolder=True, needTostartWithHome=True))
@@ -749,10 +749,10 @@ def browser_download_image():
         url = pyperclip.paste()
         name = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%s_wget.png')
         result = os.popen(f"wget -t 5 --https-only \'{url}\' --output-document={name}").read()
-        os.system(f'notify-send -i firefox -t 1000 "image downloaded" "{result}"')
-        os.system(f'feh {name}')
+        subprocess.run(f'notify-send -i firefox -t 1000 "image downloaded" "{result}" &', shell=True)
+        subprocess.run(f'feh {name} &', shell=True)
     except:
-        os.system(f'notify-send -i error -t 3000 "error while downloading image"')
+        subprocess.run(f'notify-send -i error -t 3000 "error while downloading image" &', shell=True)
 
 def browser_select_by_preference():
     x = 0
@@ -802,7 +802,7 @@ def workout_done(nOfDays=1, dirDone='done'):
 
 def text_editor_open_file(file):
     default_text_editor = system_application_get_default('text/x-python')
-    os.system(f"{default_text_editor} {file}")
+    subprocess.run(f"{default_text_editor} {file} &", shell=True)
 
 #############
 ## startup ##
@@ -829,12 +829,12 @@ def startup():
     # Start custom scripts:
 
     ulogme_command = data_get('startup-ulogme', isFileOrFolder=True, needTostartWithHome=True)
-    # autokey_command = data_get('startup-autokey', isFileOrFolder=True, needTostartWithHome=True)
+    autokey_command = data_get('startup-autokey', isFileOrFolder=True, needTostartWithHome=True)
     anki_screenshot_notification_command = data_get('startup-anki_screenshot_notification', isFileOrFolder=True, needTostartWithHome=True)
     # aw_activitywatch_command = data_get('startup-aw_activitywatch', isFileOrFolder=True, needTostartWithHome=True)
 
     # commands = [flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command, aw_activitywatch_command]
-    commands = [flameshot_command, redshift_command, ulogme_command, anki_screenshot_notification_command]
+    commands = [flameshot_command, redshift_command, ulogme_command, anki_screenshot_notification_command, autokey_command]
 
 
     for com in commands:
@@ -964,6 +964,14 @@ def i3_workspace(mode='focus', x='next'):
         command = f"{base} {mode} {common} {ws}"
     subprocess.run(command, shell=True)
 
+def i3_exit_kill_ulogme():
+    process = ['ulogme_data', 'keyfreq', 'logactivewin']
+    for p in process:
+        subprocess.run(f"pkill {p} &", shell=True)
+
+def i3_exit_session():
+    i3_exit_kill_ulogme()
+    subprocess.run("i3-msg exit &", shell=True)
 
 
 
