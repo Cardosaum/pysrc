@@ -1,11 +1,8 @@
 {
-    "type": "script",
-    "description": "runBrowser_sites_outlook",
-    "store": {},
+    "type": "folder",
+    "title": "autokey",
     "modes": [],
     "usageCount": 0,
-    "prompt": false,
-    "omitTrigger": false,
     "showInTrayMenu": false,
     "abbreviation": {
         "abbreviations": [],
@@ -16,12 +13,8 @@
         "wordChars": "[\\w]"
     },
     "hotkey": {
-        "modifiers": [
-            "<alt>",
-            "<shift>",
-            "<super>"
-        ],
-        "hotKey": "s"
+        "modifiers": [],
+        "hotKey": null
     },
     "filter": {
         "regex": null,

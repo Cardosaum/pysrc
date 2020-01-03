@@ -2,9 +2,7 @@
     "type": "script",
     "description": "browser_copyLink",
     "store": {},
-    "modes": [
-        3
-    ],
+    "modes": [],
     "usageCount": 7,
     "prompt": false,
     "omitTrigger": false,

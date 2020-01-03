@@ -1,27 +1,27 @@
 {
     "type": "script",
-    "description": "runBrowser_sites_outlook",
+    "description": "misc_osinfo",
     "store": {},
-    "modes": [],
+    "modes": [
+        1
+    ],
     "usageCount": 0,
     "prompt": false,
     "omitTrigger": false,
     "showInTrayMenu": false,
     "abbreviation": {
-        "abbreviations": [],
+        "abbreviations": [
+            "@osinfo"
+        ],
         "backspace": true,
-        "ignoreCase": false,
-        "immediate": false,
+        "ignoreCase": true,
+        "immediate": true,
         "triggerInside": false,
         "wordChars": "[\\w]"
     },
     "hotkey": {
-        "modifiers": [
-            "<alt>",
-            "<shift>",
-            "<super>"
-        ],
-        "hotKey": "s"
+        "modifiers": [],
+        "hotKey": null
     },
     "filter": {
         "regex": null,

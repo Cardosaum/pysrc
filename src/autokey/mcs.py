@@ -516,7 +516,7 @@ def tg_bot(bot_token, chatID, message):
 
 ##########
 ##Ulogme##
-##########
+##########/home/matheus/mcs/wo/R0/Thais_29_66/VCL66VHR3_S7_L001_R1_001aafreq.csv
 
 def ulogme_run():
     ulogme_directory = data_get('ulogme_directory', isFileOrFolder=True, needTostartWithHome=True)
@@ -804,11 +804,24 @@ def text_editor_open_file(file):
     default_text_editor = system_application_get_default('text/x-python')
     subprocess.run(f"{default_text_editor} {file} &", shell=True)
 
+def shell_run_list_commands_background(commands):
+    for process in commands:
+        subprocess.run(f"{process} &", shell=True)
+
+def shell_run_one_command_background(command):
+    subprocess.run(f'{command} &', shell=True)
+
+
 #############
 ## startup ##
 #############
 
 def startup():
+
+    #######
+    # Old #
+    #######
+
     # ## DEPRECATED - work in Plasma KDE (but currently I'm using i3wm)
     # # Set Wallpaper:
 
@@ -820,31 +833,76 @@ def startup():
     # wallpaper_command = data_get('wallpaper_path')[0]
     # subprocess.run(wallpaper_command, shell=True)
 
-    # Start Programs:
 
-    # synapse_command = 'synapse --startup'
+    ###########################
+    # Computer configurations #
+    ###########################
+
+    # Set touchpad configuration
+    touchpad_tapping = 'xinput set-prop "SYNA7DB5:01 06CB:CD41 Touchpad" "libinput Tapping Enabled" 1'
+    touchpad_natural_scrolling = 'xinput set-prop "SYNA7DB5:01 06CB:CD41 Touchpad" "libinput Natural Scrolling Enabled" 1'
+
+    # Set keyboard repeat delay
+    keyboard_delay = 'xset r rate 300 30'
+    # Set keyboard layout
+    keyboard_layout = 'setxkbmap -model acer_laptop -layout br'
+
+
+    ##################
+    # Start Programs #
+    ##################
+
     flameshot_command = 'flameshot'
     redshift_command = 'redshift -O 4100 -g 0.8'
+    parcellite_command = 'parcellite'
+    dunst_command = '/usr/bin/dunst'
+    sxhkd_command = f"pkill sxhkd ; sxhkd -c {data_get('file__sxhkd_mcs.txt', isFileOrFolder=True, needTostartWithHome=True)}"
 
     # Start custom scripts:
 
     ulogme_command = data_get('startup-ulogme', isFileOrFolder=True, needTostartWithHome=True)
-    autokey_command = data_get('startup-autokey', isFileOrFolder=True, needTostartWithHome=True)
+    autokey_command = 'startup_autokey.py'
+    wallpapers_command = 'wallpapers_random.py'
+    sxhkd_command = 'run_program_sxhkd.py'
     anki_screenshot_notification_command = data_get('startup-anki_screenshot_notification', isFileOrFolder=True, needTostartWithHome=True)
-    # aw_activitywatch_command = data_get('startup-aw_activitywatch', isFileOrFolder=True, needTostartWithHome=True)
 
-    # commands = [flameshot_command, redshift_command, ulogme_command, autokey_command, anki_screenshot_notification_command, aw_activitywatch_command]
-    commands = [flameshot_command, redshift_command, ulogme_command, anki_screenshot_notification_command, autokey_command]
+    commands = []
+    commands.append(touchpad_tapping)
+    commands.append(touchpad_natural_scrolling)
+    commands.append(keyboard_delay)
+    commands.append(keyboard_layout)
+    commands.append(flameshot_command)
+    commands.append(redshift_command)
+    commands.append(parcellite_command)
+    commands.append(dunst_command)
+    commands.append(ulogme_command)
+    commands.append(autokey_command)
+    commands.append(wallpapers_command)
+    commands.append(sxhkd_command)
+    commands.append(anki_screenshot_notification_command)
+
+    shell_run_list_commands_background(commands)    
+
+def startup_autokey(ui='gtk'):
+    autokey_flavor = f'autokey.{ui}ui'
+    autokey_path = data_get('autokey_path', isFileOrFolder=True, needTostartWithHome=True)
+    os.chdir(os.path.join(autokey_path, 'lib'))
+    subprocess.run(f'/usr/bin/python3 -m {autokey_flavor} &', shell=True)
 
 
-    for com in commands:
-        subprocess.run(f'{com} &', shell=True)
+####################
+# Personalizations #
+####################
+
+def wallpapers_random():
+    feh_command = 'feh --randomize --bg-fill /home/matheus/mcs/mat/images/myImages/background/wallpapers/*'
+    shell_run_one_command_background(feh_command)
+
 
 
 ############
 ### i3wm ###
 ############
-
 
 def i3_get_workspaces_names():
     '''
@@ -973,9 +1031,13 @@ def i3_exit_session():
     i3_exit_kill_ulogme()
     subprocess.run("i3-msg exit &", shell=True)
 
+#####################
+# Keyboard Shortcus #
+#####################
 
-
-
+def run_program_sxhkd():
+    sxhkd_command = f"pkill sxhkd ; sxhkd -c {data_get('file__sxhkd_mcs.txt', isFileOrFolder=True, needTostartWithHome=True)}"
+    shell_run_one_command_background(sxhkd_command)
 
 
 ############

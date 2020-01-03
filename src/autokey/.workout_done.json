@@ -2,9 +2,7 @@
     "type": "script",
     "description": "workout_done",
     "store": {},
-    "modes": [
-        3
-    ],
+    "modes": [],
     "usageCount": 0,
     "prompt": false,
     "omitTrigger": false,

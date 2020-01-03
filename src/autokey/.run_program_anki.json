@@ -2,9 +2,7 @@
     "type": "script",
     "description": "run_program_anki",
     "store": {},
-    "modes": [
-        3
-    ],
+    "modes": [],
     "usageCount": 0,
     "prompt": false,
     "omitTrigger": false,
@@ -19,6 +17,7 @@
     },
     "hotkey": {
         "modifiers": [
+            "<shift>",
             "<super>"
         ],
         "hotKey": "a"
