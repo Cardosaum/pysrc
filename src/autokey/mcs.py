@@ -441,7 +441,7 @@ def anki_add_print(mode='onlyPaste', usemouse=True, numberOfField=3, simpleMode=
     else:
         pass
 
-def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPics=True, countAllCards=False, wait=False):
+def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPics=True, countAllCards=False, wait=False, in_line_message=False):
     if wait:
         time.sleep(600)
     plataform = subprocess.sys.platform
@@ -495,7 +495,13 @@ def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPic
         sumary = '\n'.join(sumary)
         message = f"You have <b>{len(files)}</b> screenshots of the last <b>{nOfWeeks}</b> weeks waiting to become cards!"
         text = f'{message}\n\n{sumary}'
-        tg_bot(data_get('tg_bots_mike_token'), data_get('tg_bots_chatID_mcs'), text)
+        if in_line_message:
+            print('''\
+                You have \033[1;32m{}\033[0m screenshots waiting to become cards!
+                '''.format(len(files)))
+            print(text)
+        else:
+        	tg_bot(data_get('tg_bots_mike_token'), data_get('tg_bots_chatID_mcs'), text)
 
         return text
     else:
@@ -853,6 +859,7 @@ def startup():
     ##################
 
     flameshot_command = 'flameshot'
+    rsibreak_command = 'rsibreak'
     redshift_command = 'redshift -O 4100 -g 0.8'
     parcellite_command = 'parcellite'
     dunst_command = '/usr/bin/dunst'
@@ -872,6 +879,7 @@ def startup():
     commands.append(keyboard_delay)
     commands.append(keyboard_layout)
     commands.append(flameshot_command)
+    commands.append(rsibreak_command)
     commands.append(redshift_command)
     commands.append(parcellite_command)
     commands.append(dunst_command)
@@ -1260,6 +1268,9 @@ def run_program_telegram():
 
 def run_program_gnome_todo():
     runCommand('gnome-todo')
+
+def run_program_spotify():
+    runCommand('spotify')
 
 def runBrowser_translate_linguee():
     translate('linguee')

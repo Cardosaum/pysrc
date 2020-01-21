@@ -1,6 +1,7 @@
 # personal data
 bin/
 bash/
+test/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
