@@ -859,6 +859,7 @@ def startup():
     ##################
 
     flameshot_command = 'flameshot'
+    activitywatch_command = 'aw-qt'
     rsibreak_command = 'rsibreak'
     redshift_command = 'redshift -O 4100 -g 0.8'
     parcellite_command = 'parcellite'
@@ -879,6 +880,7 @@ def startup():
     commands.append(keyboard_delay)
     commands.append(keyboard_layout)
     commands.append(flameshot_command)
+    commands.append(activitywatch_command)
     commands.append(rsibreak_command)
     commands.append(redshift_command)
     commands.append(parcellite_command)
@@ -1232,6 +1234,9 @@ def run_webgrafia():
 
 def run_program_anki():
     runCommand("anki -p 'study'")
+
+def time_study_interval():
+    runCommand("yad --title=interval_mcs")
 
 def run_program_browser():
     runCommand(browser_select_by_preference())

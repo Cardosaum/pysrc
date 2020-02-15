@@ -1,187 +1,67 @@
 #!/usr/bin/env python3
-import pyperclip
-import pyautogui
-from os import popen, system, chdir, getcwd
-from os.path import expanduser, abspath
-from time import sleep
-import re
-from sys import exit
-import mcs
+
+"""
+This script cipy image from gThumb and open ImageOcclusion window
+(Intended to work with both Anki and gThumb open)
+"""
+
 ### CONFIGURATION ###
 
 anki_profile_name = 'study'
+anki_dir = './anki'
 
 #####################
 
-ankiWindow = ''
-addWindow = ''
-imgOclWindow = ''
-gthumbWindow = ''
-gthumb_x = ''
-gthumb_y = ''
-gthumb_width = ''
-gthumb_height = ''
-home = expanduser('~')
-clipboard = pyperclip.paste()
+from pprint import pprint
+import subprocess
+import pyautogui
+import mcs
+import re
+import time
+import pathlib
+import pyperclip
+import collections
+import os
 
+###################
+## Setup variables
+
+# normalize path
 mcs.normalizePath()
-chdir(abspath(f'{getcwd()}/src/autokey/'))
+os.chdir(pathlib.Path.joinpath(pathlib.Path.cwd(), 'src/autokey/'))
 
-# function to get active window
+# Get previous clipboard content to resetore later
+previousClipboard = pyperclip.paste()
+
+# Set absolute paths for variables
+anki_dir = pathlib.Path(anki_dir).resolve()
+gthumb_dir = pathlib.Path.joinpath(anki_dir, 'add_imgOcl/gthumbWindow')
+imgOcl_dir = pathlib.Path.joinpath(anki_dir, 'add_imgOcl/imgOclWindow')
+add_dir = pathlib.Path.joinpath(anki_dir, 'add_imgOcl/addWindow')
+
+# Dictionary with window properties
+win = collections.defaultdict(dict)
+win['home'] = pathlib.Path.home()
+
+
+###################
+
+
 def activeWindow():
-    activeWindow = popen('xdotool getactivewindow getwindowname').read().replace('\n','')
+    """ function to get active window """
+    activeWindow = subprocess.getoutput('xdotool getactivewindow getwindowname')
     return activeWindow
 
-# TODO: function to open image occlusion and click on fit
-def openImgOcl():
-    global imgOclWindow, addWindow
-    # if img occlusion is already open, close it first (we must do it in order to open a new instance with our recentrly copies image)
-    if imgOclWindow:
-        popen(f'wmctrl -ic {imgOclWindow}')
-        popen(f'wmctrl -ia {addWindow}')
-        while True:
-            try:
-                pyautogui.locateOnScreen(f'imgtlf/2019-07-26_12-13-24_1564154004_flameshot.png', grayscale=True)
-                break
-            except:
-                sleep(0.2)
-                continue
-        pyautogui.hotkey('ctrl', 'shift', 'o')
-        while True:
-            try:
-                buttFit = pyautogui.center(pyautogui.locateOnScreen(f'imgtlf/2019-07-25_12-08-46_1564067326_flameshot.png', grayscale=True))
-                pyautogui.click(buttFit[0], buttFit[1])
-                break
-            except:
-                pass
-            try:
-                buttFit = pyautogui.center(pyautogui.locateOnScreen(f'imgtlf/2019-07-25_13-38-16_1564072696_flameshot.png', grayscale=True))
-                pyautogui.click(buttFit[0], buttFit[1])
-                break
-            except:
-                pass
-            sleep(0.2)
-        getWindows = popen('wmctrl -lG').read()
-        windowRegex = re.compile(r'''(
-                                    ([\w\d]+)       # window id
-                                    \s+
-                                    ([\d-]+)        # desktop
-                                    \s+
-                                    (\d+)           # x-offset
-                                    \s+
-                                    (\d+)           # y-offset
-                                    \s+
-                                    (\d+)           # width
-                                    \s+
-                                    (\d+)           # height
-                                    \s+
-                                    ([\w-]+)        # owner
-                                    \s+
-                                    (.+)            # window name
-                                 )''', re.VERBOSE)
+def getWindows():
+    """ get a list of all open windows """
+    return subprocess.getoutput('wmctrl -lG')
 
-        for line in windowRegex.findall(getWindows):
-            if line[8] == f'{anki_profile_name} - Anki':
-                ankiWindow = line[1]
-            if line[8] == 'Add':
-                addWindow = line[1]
-            if line[8] == 'Image Occlusion Enhanced - Add Mode':
-                imgOclWindow = line[1]
-            if line[8] == 'gThumb':
-                gthumbWindow = line[1]
-                gthumb_x = int(line[3])
-                gthumb_y = int(line[4])
-                gthumb_width = int(line[5])
-                gthumb_height = int(line[6])
+def parseWindows(windowsList):
+    """ Parse result of `getWindows()` function and return wanted windows """
 
-        popen(f'wmctrl -ir {imgOclWindow} -b add,maximized_vert,maximized_horz')
-        sleep(0.1)
-        pyautogui.press('f')
-        pyautogui.press('r')
-    # if img occlusion is not open, open it and select fit
-    else:
-        popen(f'wmctrl -ia {addWindow}')
-        while True:
-            try:
-                pyautogui.locateOnScreen(f'imgtlf/2019-07-26_12-13-24_1564154004_flameshot.png', grayscale=True)
-                break
-            except:
-                sleep(0.2)
-                continue
-        pyautogui.hotkey('ctrl', 'shift', 'o')
-        while True:
-            try:
-                buttFit = pyautogui.center(pyautogui.locateOnScreen(f'imgtlf/2019-07-25_12-08-46_1564067326_flameshot.png', grayscale=True))
-                pyautogui.click(buttFit[0], buttFit[1])
-                break
-            except:
-                pass
-            try:
-                buttFit = pyautogui.center(pyautogui.locateOnScreen(f'imgtlf/2019-07-25_13-38-16_1564072696_flameshot.png', grayscale=True))
-                pyautogui.click(buttFit[0], buttFit[1])
-                break
-            except:
-                pass
-            sleep(0.2)
-        getWindows = popen('wmctrl -lG').read()
-        windowRegex = re.compile(r'''(
-                                    ([\w\d]+)       # window id
-                                    \s+
-                                    ([\d-]+)        # desktop
-                                    \s+
-                                    (\d+)           # x-offset
-                                    \s+
-                                    (\d+)           # y-offset
-                                    \s+
-                                    (\d+)           # width
-                                    \s+
-                                    (\d+)           # height
-                                    \s+
-                                    ([\w-]+)        # owner
-                                    \s+
-                                    (.+)            # window name
-                                 )''', re.VERBOSE)
+    global win
 
-        for line in windowRegex.findall(getWindows):
-            if line[8] == f'{anki_profile_name} - Anki':
-                ankiWindow = line[1]
-            if line[8] == 'Add':
-                addWindow = line[1]
-            if line[8] == 'Image Occlusion Enhanced - Add Mode':
-                imgOclWindow = line[1]
-            if line[8] == 'gThumb':
-                gthumbWindow = line[1]
-                gthumb_x = int(line[3])
-                gthumb_y = int(line[4])
-                gthumb_width = int(line[5])
-                gthumb_height = int(line[6])
-
-        popen(f'wmctrl -ir {imgOclWindow} -b add,maximized_vert,maximized_horz')
-        sleep(0.1)
-        pyautogui.press('f')
-        pyautogui.press('r')
-
-
-# function to copy gThumb img to clipboard, restoring previus clipboard after that
-
-def gthumCopyImage():
-    pressMouseIn = (int(gthumb_width/2), int((gthumb_height/2)-(gthumb_height*0.3)))
-    pyautogui.moveTo((gthumb_x+pressMouseIn[0], gthumb_y+pressMouseIn[1]))
-    pyautogui.rightClick()
-    # while True:
-    #     try:
-    #         buttCopy = pyautogui.center(pyautogui.locateOnScreen(f'imgtlf/2019-07-26_11-18-58_1564150738_flameshot.png', grayscale=True))
-    #         break
-    #     except:
-    #         sleep(0.2)
-    #         continue
-    pyautogui.click(((gthumb_x+pressMouseIn[0]+40), (gthumb_y+pressMouseIn[1]+122)))
-
-# Verify if anki and gthumb are open
-
-
-getWindows = popen('wmctrl -lG').read()
-windowRegex = re.compile(r'''(
+    windowRegex = re.compile(r'''(
                             ([\w\d]+)       # window id
                             \s+
                             ([\d-]+)        # desktop
@@ -199,50 +79,165 @@ windowRegex = re.compile(r'''(
                             (.+)            # window name
                          )''', re.VERBOSE)
 
-for line in windowRegex.findall(getWindows):
-    if line[8] == f'{anki_profile_name} - Anki':
-        ankiWindow = line[1]
-    if line[8] == 'Add':
-        addWindow = line[1]
-    if line[8] == 'Image Occlusion Enhanced - Add Mode':
-        imgOclWindow = line[1]
-    if line[8] == 'gThumb':
-        gthumbWindow = line[1]
-        gthumb_x = int(line[3])
-        gthumb_y = int(line[4])
-        gthumb_width = int(line[5])
-        gthumb_height = int(line[6])
+    for window in windowRegex.findall(windowsList):
+        # Get window name, window id
+        wn = window[8]
+        wid = window[1]
 
-# TODO: copy image from gthumb
+        if wn == f"{anki_profile_name} - Anki":
+            win['ankiWindow'] = wid
 
-# Only execute if current window is 'Anki - Add' or 'gThumb'
+        elif wn == 'Add':
+            win['addWindow'] = wid
 
-if gthumbWindow:
-    if addWindow:
-        if activeWindow() == 'gThumb':
-            # copy img to clipboard
-            gthumCopyImage()
-            # open img occlusion and click on fit
-            openImgOcl()
-        elif activeWindow() == 'Add':
-            # change to gthumb and copy img to clipboard
-            popen(f'wmctrl -ia {gthumbWindow}')
-            while True:
-                try:
-                    pyautogui.locateOnScreen(f'imgtlf/2019-07-26_11-52-19_1564152739_flameshot.png', grayscale=True)
-                    break
-                except:
-                    sleep(0.2)
-                    continue
-            gthumCopyImage()
-            # open img occlusion and click on fit
-            openImgOcl()
-        else:
-            pyautogui.alert(title='ERROR: gThumbToImageOcclusion', text="Your current window must be 'Add' or 'gThumb' to execute this shortcut!", button='OK!')
+        elif wn == 'Image Occlusion Enhanced - Add Mode':
+            win['imgOclWindow'] = wid
+            win['imgOclWindow_x'] = int(window[3])
+            win['imgOclWindow_y'] = int(window[4])
+            win['imgOclWindow_width'] = int(window[5])
+            win['imgOclWindow_height'] = int(window[6])
+
+
+        elif wn == 'gThumb':
+            win['gthumbWindow'] = wid
+            win['gthumbWindow_x'] = int(window[3])
+            win['gthumbWindow_y'] = int(window[4])
+            win['gthumbWindow_width'] = int(window[5])
+            win['gthumbWindow_height'] = int(window[6])
+
+    return win
+
+def atualizeWindow():
+    return parseWindows(getWindows())
+
+def opengThumb():
+    """ open `gThumb` window """
+
+    atualizeWindow()
+    assert win['gthumbWindow'], 'gThumb window is closed!'
+
+    subprocess.getoutput(f'wmctrl -ia {win["gthumbWindow"]}')
+    ensureOpen('gthumbWindow')
+
+
+
+def gThumbCopyImg():
+    """ Copy image on gThumb window, using mouse """
+
+    atualizeWindow()
+
+    # Get location where to press mouse button (certifying that is inside gThumb window)
+    pressMouseIn = (int(win['gthumbWindow_width']/2), int((win['gthumbWindow_height']/2)-(win['gthumbWindow_height']*0.3)))
+    pyautogui.moveTo((win['gthumbWindow_x']+pressMouseIn[0], win['gthumbWindow_y']+pressMouseIn[1]))
+    pyautogui.rightClick()
+    pyautogui.click(((win['gthumbWindow_x']+pressMouseIn[0]+40), (win['gthumbWindow_y']+pressMouseIn[1]+122)))
+
+
+def openImgOcl():
+    """ Open Image Occlusion window """
+
+    atualizeWindow()
+
+    # if img occlusion is already open, close it first (we must do it in order to open a new instance with our previous copied image)
+    if win['imgOclWindow']:
+        # Close open Image Occlusion Window
+        subprocess.getoutput(f'wmctrl -ic {win["imgOclWindow"]}')
+        # Activate `Add` window
+        subprocess.getoutput(f'wmctrl -ia {win["addWindow"]}')
+
+        # Ensure `Add` window is open and active
+        ensureOpen('addWindow')
+
+        # Shortcut to open `Image Occlusion Window`
+        pyautogui.hotkey('ctrl', 'shift', 'o')
+        ensureOpen('imgOclWindow')
+        findOnScreen(getDirImgs(imgOcl_dir))
+        pointer = mouseCenter('imgOclWindow')
+        pyautogui.click(pointer)
+        pyautogui.press('f')
+        pyautogui.press('r')
+        pyautogui.moveTo(mouseCenter('imgOclWindow'))
+
+
+    if not win['imgOclWindow']:
+        # activate `Add` window
+        subprocess.getoutput(f'wmctrl -ia {win["addWindow"]}')
+        ensureOpen('addWindow')
+        
+        # Shortcut to open `Image Occlusion Window`
+        pyautogui.hotkey('ctrl', 'shift', 'o')
+        ensureOpen('imgOclWindow')
+        findOnScreen(getDirImgs(imgOcl_dir))
+        pointer = mouseCenter('imgOclWindow')
+        pyautogui.click(pointer)
+        pyautogui.press('f')
+        pyautogui.press('r')
+        pyautogui.moveTo(mouseCenter('imgOclWindow'))
+
+
+def getDirImgs(directory=anki_dir, ext='png'):
+    """ return all images from directory """
+    return list(directory.glob(f'*.{ext}'))
+
+
+
+def mouseCenter(window):
+    """ click in the middle of `window` """
+
+    atualizeWindow()
+    mousePosition = ( int((win[f"{window}_x"] + win[f"{window}_width"]) / 2) , int((win[f"{window}_y"] + win[f"{window}_height"]) / 2) )
+
+    return mousePosition
+
+
+def findOnScreen(imgsList):
+    """ try to locate image on screen """
+
+    position = ''
+    while not position:
+        for img in imgsList:
+            img = str(img)
+            position = pyautogui.locateOnScreen(img)
+            if position:
+                break
+    return position
+
+
+def ensureOpen(window):
+    """ Ensure `window` window is open and active """
+
+    while not isWindowActive(window):
+        time.sleep(0.5)
+
+
+
+def isWindowActive(window):
+    """ Check if window is currently active """
+    atualizeWindow()
+    if win[window]:
+        return True
     else:
-        pyautogui.alert(title='ERROR: gThumbToImageOcclusion', text="Anki 'Add' window is closed!\nPlease, open it first.", button='OK!')
+        return False
 
 
-else:
-    pyautogui.alert(title='ERROR: gThumbToImageOcclusion', text='gThumb is closed!\nPlease, open it first.', button='OK!')
-exit(0)
+def logicCheck():
+    """ perform logic checks to ensure script can run """
+
+    atualizeWindow()
+
+    assert win['addWindow'], pyautogui.alert(title='Error - Anki Add ImgOcl', text='Window "Add" from Anki must be open!', button='OK')
+    assert win['gthumbWindow'], pyautogui.alert(title='Error - Anki Add ImgOcl', text='Window "gThumb" must be open!', button='OK')
+
+def main():
+    """ main program flow """
+
+
+    logicCheck()
+    opengThumb()
+    gThumbCopyImg()
+    openImgOcl()
+
+if __name__ == '__main__':
+
+
+    main()
