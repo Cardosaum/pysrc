@@ -1273,6 +1273,12 @@ def writeText_email_mcs_protonmail():
 def writeText_email_mcs_unb_outlook():
     getAndWriteText('email_mcs_unb_outlook')
 
+def writeText_email_mcs_ufrj_main():
+    getAndWriteText('ufrj_mail_main')
+
+def writeText_email_mcs_ufrj_dcc():
+    getAndWriteText('ufrj_mail_dcc')
+
 def run_webgrafia():
     runScript('run_webgrafia.py')
 
