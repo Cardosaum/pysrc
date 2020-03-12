@@ -3,7 +3,7 @@ Custom Scripts made by Matheus
 Intended to work with autokey
 '''
 
-import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil, keyring, json
+import datetime, os, shelve, pyautogui, re, csv, time, pyperclip, webbrowser, collections, requests, subprocess, sys, platform, shutil, keyring, json, pathlib
 
 
 
@@ -440,6 +440,44 @@ def anki_add_print(mode='onlyPaste', usemouse=True, numberOfField=3, simpleMode=
             pyautogui.alert(title='Anki ERROR', text="'Add' is closed!\nPlease, open it first.", button='OK!')
     else:
         pass
+
+def imgs_select(dirPath, fileManager="nemo"):
+    """ Use file manager to select images to merge """
+
+    # save oldClipboard to restore later
+    oldClipboard = pyperclip.paste()
+
+    # open fileManager to copy images to clipboard
+    runCommand(f'{fileManager} {dirPath}')
+    
+    # see if clipboard changed
+    while pyperclip.paste() == oldClipboard:
+        time.sleep(1)
+        
+    files = pyperclip.paste().splitlines()
+    runCommand(f'pkill {fileManager}')
+
+    # restore clipboard
+    pyperclip.copy(oldClipboard)
+    
+    return files
+
+def imgs_merge(imgs:list, outputPath, orientation='vertical'):
+    """ Merge selected images"""
+
+    if orientation == 'vertical':
+        ori = '-'
+    else:
+        ori = '+'
+        
+    imgs = ' '.join(imgs)
+    timestamp = datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S_%s')
+    filename = f'{timestamp}_merged.png'
+    outputPath = pathlib.Path(outputPath).resolve()
+    outputPath = pathlib.Path.joinpath(outputPath, filename)
+    com = f"convert {imgs} {ori}append {outputPath}"
+    print(com)
+    runCommand(com)
 
 def anki_screenshot_notification(dirPath, nOfWeeks=4, orderPerNumberOfPendingPics=True, countAllCards=False, wait=False, in_line_message=False):
     if wait:
@@ -1195,6 +1233,12 @@ def writeText_code_enterTODO():
 def writeText_cpf():
     getAndWriteText('cpf')
 
+def writeText_ufrj_dre():
+    getAndWriteText('ufrj_dre')
+
+def writeText_ufrj_mail_dcc():
+    getAndWriteText('ufrj_mail_dcc')
+
 def writeText_rg():
     getAndWriteText('rg')
 
@@ -1306,6 +1350,13 @@ def runBrowser_openUrl():
 
 def screenshot_maim_region():
     takeScreenshot(program='maim', mode='region')
+
+def imgs_select_run():
+    imgs_select("/home/matheus/trash_mcs")
+
+def imgs_merge_run():
+    path = data_get('printPath', isFileOrFolder=True, needTostartWithHome=True)
+    imgs_merge(imgs_select(path), path)
 
 def screenshot_flameshot_region():
     takeScreenshot(program='flameshot', mode='region')
