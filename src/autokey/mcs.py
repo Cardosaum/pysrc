@@ -271,6 +271,9 @@ def gthumbCopyAndPaste(typeOfCopy='removePrevious', usemouse=True, numberOfField
     else:
         sys.exit()
 
+
+   
+
 def gthumbCopyImageWithMouse():
     if getActiveWindow() == 'gThumb':
         pass
@@ -441,7 +444,7 @@ def anki_add_print(mode='onlyPaste', usemouse=True, numberOfField=3, simpleMode=
     else:
         pass
 
-def imgs_select(dirPath, fileManager="nemo"):
+def imgs_select(dirPath, fileManager="geeqie"):
     """ Use file manager to select images to merge """
 
     # save oldClipboard to restore later
@@ -1095,6 +1098,34 @@ def run_program_sxhkd():
 def rclone_is_running():
     # TODO:
     pass
+
+
+
+####################
+# Handle images
+####################
+
+def geeqieCopyImage(copy_type:str, default_quoted="ctrl-shift-c", default_unquoted="ctrl-c"):
+    """Copy image to clipboard"""
+
+    gq = 'Geeqie'
+    quoted = default_quoted.split('-')
+    unquoted = default_unquoted.split('-')
+
+    assert copy_type in ['quoted', 'unquoted'], "copy_type must be either 'quoted' or 'unquoted'"
+    assert isWindowActive(gq), "Geeqie must be open"
+
+    # we want to preserve clipboard
+    oldClipboard = pyperclip.paste()
+    waitUntilWindowActivate(gq)
+    if copy_type == 'quoted':
+        pyautogui.hotkey('ctrl', 'shift', 'c')
+    else:
+        pyautogui.hotkey('ctrl', 'c')
+    subprocess.Popen(f"echo -n 'file://{pyperclip.paste()}' | xclip -selection clipboard -t text/plain", shell=True)
+
+def gqq():
+    geeqieCopyImage('unquoted')
 
 ##############
 # call scripts
