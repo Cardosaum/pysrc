@@ -1334,6 +1334,27 @@ def run_program_feh_workout():
 def run_program_fsearch():
     runCommand("fsearch")
 
+def run_program_rsibreak():
+    runCommand("killall rsibreak;rsibreak > /dev/null 2>&1")
+
+def run_program_pomodoro_start_stop():
+    runCommand("gnome-pomodoro --start-stop")
+
+def run_program_pomodoro_start():
+    runCommand("gnome-pomodoro --start")
+
+def run_program_pomodoro_stop():
+    runCommand("gnome-pomodoro --stop")
+
+def run_program_pomodoro_pause_resume():
+    runCommand("gnome-pomodoro --pause-resume")
+
+def run_program_pomodoro_pause():
+    runCommand("gnome-pomodoro --pause")
+
+def run_program_pomodoro_resume():
+    runCommand("gnome-pomodoro --resume")
+
 def run_program_xkill():
     runCommand("xkill")
 
