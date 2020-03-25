@@ -1355,6 +1355,9 @@ def run_program_pomodoro_pause():
 def run_program_pomodoro_resume():
     runCommand("gnome-pomodoro --resume")
 
+def run_program_pomodoro_quit():
+    runCommand("gnome-pomodoro --quit")
+
 def run_program_xkill():
     runCommand("xkill")
 
