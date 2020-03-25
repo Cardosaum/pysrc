@@ -52,6 +52,16 @@ def activeWindow():
     activeWindow = subprocess.getoutput('xdotool getactivewindow getwindowname')
     return activeWindow
 
+def waitWindowRaise(pattern:str):
+    """wait until current window have `pattern` on its name"""
+    win = re.compile(pattern)
+    while True:
+        match = win.search(activeWindow())
+        if match:
+            break
+        time.sleep(0.1)
+    return True
+
 def getWindows():
     """ get a list of all open windows """
     return subprocess.getoutput('wmctrl -lG')
@@ -133,24 +143,35 @@ def gThumbCopyImg():
     pyautogui.click(((win['gthumbWindow_x']+pressMouseIn[0]+40), (win['gthumbWindow_y']+pressMouseIn[1]+122)))
 
 
-def openImgOcl():
+def openImgOcl(findOnScreen=False):
     """ Open Image Occlusion window """
 
     atualizeWindow()
+
+    # TODO: handle img oclusion with mouse click hard coded
 
     # if img occlusion is already open, close it first (we must do it in order to open a new instance with our previous copied image)
     if win['imgOclWindow']:
         # Close open Image Occlusion Window
         subprocess.getoutput(f'wmctrl -ic {win["imgOclWindow"]}')
-        # Activate `Add` window
-        subprocess.getoutput(f'wmctrl -ia {win["addWindow"]}')
 
-        # Ensure `Add` window is open and active
-        ensureOpen('addWindow')
+    # Activate `Add` window
+    subprocess.getoutput(f'wmctrl -ia {win["addWindow"]}')
 
-        # Shortcut to open `Image Occlusion Window`
-        pyautogui.hotkey('ctrl', 'shift', 'o')
-        ensureOpen('imgOclWindow')
+    # Ensure `Add` window is open and active
+    ensureOpen('addWindow')
+
+    # Shortcut to open `Image Occlusion Window`
+    pyautogui.hotkey('ctrl', 'shift', 'o')
+    ensureOpen('imgOclWindow')
+
+    atualizeWindow()
+
+    # Activate `ImgOcclusion` window
+    subprocess.getoutput(f'wmctrl -ia {win["imgOclWindow"]}')
+    waitWindowRaise('Image Occlusion Enhanced - Add Mode')
+
+    if findOnScreen:
         findOnScreen(getDirImgs(imgOcl_dir))
         pointer = mouseCenter('imgOclWindow')
         pyautogui.click(pointer)
@@ -158,21 +179,17 @@ def openImgOcl():
         pyautogui.press('r')
         pyautogui.moveTo(mouseCenter('imgOclWindow'))
 
-
-    if not win['imgOclWindow']:
-        # activate `Add` window
-        subprocess.getoutput(f'wmctrl -ia {win["addWindow"]}')
-        ensureOpen('addWindow')
-        
-        # Shortcut to open `Image Occlusion Window`
-        pyautogui.hotkey('ctrl', 'shift', 'o')
-        ensureOpen('imgOclWindow')
-        findOnScreen(getDirImgs(imgOcl_dir))
-        pointer = mouseCenter('imgOclWindow')
-        pyautogui.click(pointer)
+    else:
+        from pprint import pprint
+        pprint(win)
+        mouse_x = win['imgOclWindow_x'] + win['imgOclWindow_width']/2
+        mouse_y = win['imgOclWindow_y'] + win['imgOclWindow_height']/2
+        print(mouse_x, mouse_y)
+        pyautogui.moveTo(mouse_x, mouse_y, 4, pyautogui.easeInBounce)
+        pyautogui.click(clicks=5, pause=0.2)
         pyautogui.press('f')
         pyautogui.press('r')
-        pyautogui.moveTo(mouseCenter('imgOclWindow'))
+
 
 
 def getDirImgs(directory=anki_dir, ext='png'):
