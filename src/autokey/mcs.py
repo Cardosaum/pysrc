@@ -1385,6 +1385,9 @@ def run_program_gnome_todo():
 def run_program_spotify():
     runCommand('spotify')
 
+def run_program_suspend():
+    runCommand('sleep 3 && /usr/bin/systemctl suspend')
+
 def runBrowser_translate_linguee():
     translate('linguee')
 
