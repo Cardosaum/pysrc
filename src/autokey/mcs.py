@@ -923,7 +923,7 @@ def startup():
     commands.append(flameshot_command)
     commands.append(activitywatch_command)
     commands.append(rsibreak_command)
-    commands.append(redshift_command)
+    # commands.append(redshift_command)
     commands.append(parcellite_command)
     commands.append(dunst_command)
     commands.append(ulogme_command)
