@@ -810,8 +810,12 @@ def browser_select_by_preference():
     return command
 
 
-def system_application_get_default(mimeType):
+def system_application_get_default(mimeType, default="emacsclient -c"):
     app = subprocess.getoutput(f'xdg-mime query default {mimeType}').replace('.desktop', '')
+
+    if default:
+        return default
+
     if app == 'sublime_text':
         command = 'subl'
     if app == 'sublime_text_3':
@@ -1442,6 +1446,9 @@ def text_editor_open_i3configmcs():
 
 def text_editor_open_sxhkd_mcs():
     text_editor_open_file(data_get('file__sxhkd_mcs.txt', isFileOrFolder=True, needTostartWithHome=True))
+
+def text_editor_open_todo():
+    text_editor_open_file('/home/matheus/todo.org')
 
 def text_editor_open_zpreztorc():
     text_editor_open_file(data_get('file__zpreztorc', isFileOrFolder=True, needTostartWithHome=True))
