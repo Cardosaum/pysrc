@@ -219,7 +219,7 @@ def activateWindow(windowPattern):
 ### deprecated ###
 def gthumbCopyAndPaste(typeOfCopy='removePrevious', usemouse=True, numberOfField=1):
 
-    if getActiveWindow() == 'gThumb':
+    if getActiveWindow() == 'Image Viewer':
         pyautogui.PAUSE = 0.1
         addInfo = getWindowInfo('Add', moreInfo=True, exactMatch=True)
         if 'Add' in addInfo:
@@ -272,21 +272,21 @@ def gthumbCopyAndPaste(typeOfCopy='removePrevious', usemouse=True, numberOfField
         sys.exit()
 
 
-   
+
 
 def gthumbCopyImageWithMouse():
-    if getActiveWindow() == 'gThumb':
+    if getActiveWindow() == 'Image Viewer':
         pass
     else:
         try:
-            activateWindow('gThumb')
+            activateWindow('Image Viewer')
         except:
             print('ERROR: gThumb is not active window')
             raise NameError
 
     pyPause = pyautogui.PAUSE
     pyautogui.PAUSE = 0.3
-    gthumbWindowInfo = getWindowInfo('gThumb', moreInfo=True)
+    gthumbWindowInfo = getWindowInfo('Image Viewer', moreInfo=True)
     gthumb_x = float(gthumbWindowInfo[1][3])
     gthumb_y = float(gthumbWindowInfo[1][4])
     gthumb_width = float(gthumbWindowInfo[1][5])
@@ -302,11 +302,11 @@ def gthumbCopyImageWithMouse():
 def gthumbCopyImageWithKeyboard(manipulateCopy=False, restoreClipboard=True, onlyBasename=False):
     if restoreClipboard:
         oldClipboard = pyperclip.paste()
-    if getActiveWindow() == 'gThumb':
+    if getActiveWindow() == 'Image Viewer':
         pass
     else:
         try:
-            activateWindow('gThumb')
+            activateWindow('Image Viewer')
         except:
             print('ERROR: gThumb is not active window')
             raise NameError
@@ -403,7 +403,7 @@ def anki_add_htmlEditor_pasteImageFrom_gThumb(mode='write'):
 
 
 def anki_add_print(mode='onlyPaste', usemouse=True, numberOfField=3, simpleMode=True):
-    if getActiveWindow() == 'gThumb':
+    if getActiveWindow() == 'Image Viewer':
         if isWindowActive('Add'):
             time.sleep(0.6)
             pyautogui.hotkey('ctrl', 'c')
@@ -904,7 +904,7 @@ def startup():
     ##################
 
     flameshot_command = 'flameshot'
-    activitywatch_command = 'aw-qt'
+    # activitywatch_command = 'aw-qt'
     rsibreak_command = 'rsibreak'
     redshift_command = 'redshift -O 4100 -g 0.8'
     parcellite_command = 'parcellite'
@@ -925,7 +925,7 @@ def startup():
     commands.append(keyboard_delay)
     commands.append(keyboard_layout)
     commands.append(flameshot_command)
-    commands.append(activitywatch_command)
+    # commands.append(activitywatch_command)
     commands.append(rsibreak_command)
     # commands.append(redshift_command)
     commands.append(parcellite_command)
@@ -936,7 +936,7 @@ def startup():
     commands.append(sxhkd_command)
     commands.append(anki_screenshot_notification_command)
 
-    shell_run_list_commands_background(commands)    
+    shell_run_list_commands_background(commands)
 
 def startup_autokey(ui='gtk'):
     autokey_flavor = f'autokey.{ui}ui'
@@ -1318,10 +1318,10 @@ def run_webgrafia():
     runScript('run_webgrafia.py')
 
 def run_program_anki():
-    runCommand("anki -p 'study'")
+    runCommand("anki -p study")
 
 def time_study_interval():
-    runCommand("yad --title=interval_mcs")
+    runCommand("st -t interval_mcs")
 
 def run_program_browser():
     runCommand(browser_select_by_preference())
