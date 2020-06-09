@@ -1342,7 +1342,7 @@ def run_program_rsibreak_start():
     runCommand("killall rsibreak;rsibreak > /dev/null 2>&1")
 
 def run_program_rsibreak_stop():
-    runCommand("killall rsibreak")
+    runCommand("mcs_ktimer")
 
 def run_program_pomodoro_start_stop():
     runCommand("gnome-pomodoro --start-stop")
