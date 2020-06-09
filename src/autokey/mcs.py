@@ -1327,7 +1327,7 @@ def run_program_browser():
     runCommand(browser_select_by_preference())
 
 def run_program_gthumb_currentDirectory():
-    runCommand(f"gthumb -f {getPrintPath()}")
+    runCommand(f"deepin-image-viewer {getPrintPath()}")
 
 def run_program_feh_currentDirectory():
     runCommand(f'feh --reverse --sort mtime {getPrintPath()}')
